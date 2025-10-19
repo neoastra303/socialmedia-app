@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3>{{ story.author.username }}</h3>
+          {% if story.image %}
+          <img
+            src="{{ story.image.url }}"
+            class="img-fluid rounded mb-3"
+            alt="قصة"
+          />
+          {% elif story.video %}
+          <video class="img-fluid rounded mb-3" controls>
+            <source src="{{ story.video.url }}" type="video/mp4" />
+          </video>
+          {% endif %}
+          <p>{{ story.content }}</p>
+          <small class="text-muted">{{ story.created_at|timesince }}</small>
+          <br />
+          <small>{% translate "المشاهدات" %}: {{ story.views.count }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

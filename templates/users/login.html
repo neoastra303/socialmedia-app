@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">{% translate "تسجيل الدخول" %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">{% translate "اسم المستخدم" %}</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{% translate "كلمة المرور" %}</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">{% translate "تسجيل الدخول" %}</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>{% translate "ليس لديك حساب؟" %} <a href="{% url 'users:register' %}">{% translate "سجل الآن" %}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

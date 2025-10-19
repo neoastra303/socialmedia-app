@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">من يتابعهم {{ user.username }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if following %}
+                        <div class="list-group">
+                            {% for followed in following %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ followed.profile.image.url }}" alt="{{ followed.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                                        <a href="{% url 'users:profile' followed.username %}" class="text-decoration-none">{{ followed.username }}</a>
+                                    </div>
+                                    {% if user != request.user %}
+                                        {% if followed in request.user.profile.following.all %}
+                                            <a href="{% url 'users:unfollow_user' followed.username %}" class="btn btn-sm btn-unfollow">إلغاء المتابعة</a>
+                                        {% else %}
+                                            <a href="{% url 'users:follow_user' followed.username %}" class="btn btn-sm btn-follow">متابعة</a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center mb-0">لا يتابع أحداً</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

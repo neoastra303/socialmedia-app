@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">تم تسجيل الخروج بنجاح</h2>
+                    <p class="mb-4">شكراً لاستخدامك موقعنا</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary">تسجيل الدخول مرة أخرى</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

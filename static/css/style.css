@@ -1,0 +1,785 @@
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+:root {
+  --bg-primary-light: #ffffff;
+  --bg-secondary-light: #f8f9fa;
+  --text-primary-light: #212529;
+  --text-secondary-light: #6c757d;
+  --accent-color-light: #007bff;
+  --accent-hover-light: #0056b3;
+  --border-color-light: #dee2e6;
+  --hover-color-light: #e9ecef;
+  --card-shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+  --bg-primary-dark: #0d1117;
+  --bg-secondary-dark: #161b22;
+  --text-primary-dark: #f0f6fc;
+  --text-secondary-dark: #8b949e;
+  --accent-color-dark: #58a6ff;
+  --accent-hover-dark: #1f6feb;
+  --border-color-dark: #30363d;
+  --hover-color-dark: #21262d;
+  --card-shadow-dark: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+  --transition-speed: 0.4s;
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition:
+    background-color var(--transition-speed),
+    color var(--transition-speed);
+}
+
+body.light-theme {
+  --bg-primary: var(--bg-primary-light);
+  --bg-secondary: var(--bg-secondary-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --accent-color: var(--accent-color-light);
+  --accent-hover: var(--accent-hover-light);
+  --border-color: var(--border-color-light);
+  --hover-color: var(--hover-color-light);
+  --card-shadow: var(--card-shadow-light);
+}
+
+body.dark-theme {
+  --bg-primary: var(--bg-primary-dark);
+  --bg-secondary: var(--bg-secondary-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+  --accent-color: var(--accent-color-dark);
+  --accent-hover: var(--accent-hover-dark);
+  --border-color: var(--border-color-dark);
+  --hover-color: var(--hover-color-dark);
+  --card-shadow: var(--card-shadow-dark);
+}
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+/* التنسيقات العامة */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* تنسيقات الشريط العلوي */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 0.75rem 0;
+  transition: all var(--transition-speed) ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar.sticky-top {
+  top: 0;
+  z-index: 1030;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--text-primary) !important;
+  transition: color var(--transition-speed) ease;
+}
+
+.navbar-brand:hover {
+  color: var(--accent-color) !important;
+}
+
+.nav-link {
+  color: var(--text-primary) !important;
+  transition: all var(--transition-speed) ease;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.nav-link:hover {
+  color: var(--accent-color) !important;
+  background-color: var(--hover-color);
+}
+
+/* تنسيقات البطاقات */
+.card {
+  border: none;
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-speed) ease;
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  background-color: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1rem;
+}
+
+/* تنسيقات الأزرار */
+.btn {
+  transition: all var(--transition-speed) ease;
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: var(--accent-color) !important;
+  border: none;
+  border-color: var(--accent-color) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  transform: translateY(-2px);
+}
+
+/* تنسيقات الإشعارات */
+.notifications-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  transition: transform var(--transition-speed) ease;
+}
+
+.notifications-badge:hover {
+  transform: translate(50%, -50%) scale(1.1);
+}
+
+/* تنسيقات النموذج */
+.form-control {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  transition: all var(--transition-speed) ease;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25) !important;
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* تنسيقات التنبيهات */
+.alert {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+.alert-success {
+  background-color: #1e4620 !important;
+  border-color: #2a5a2b !important;
+}
+
+.alert-danger {
+  background-color: #461e1e !important;
+  border-color: #5a2a2a !important;
+}
+
+.alert-warning {
+  background-color: #463e1e !important;
+  border-color: #5a4a2a !important;
+}
+
+.alert-info {
+  background-color: #1e3a46 !important;
+  border-color: #2a4a5a !important;
+}
+
+/* تنسيقات الصور */
+.post-image {
+  transition: transform var(--transition-speed) ease;
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.post-image:hover {
+  transform: scale(1.02);
+}
+
+.post-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.post-author-avatar {
+  border: 2px solid var(--accent-color);
+  object-fit: cover;
+  transition: transform var(--transition-speed) ease;
+}
+
+.post-author-avatar:hover {
+  transform: scale(1.1);
+}
+
+/* تنسيقات التعليقات */
+.comment-section {
+  background-color: var(--bg-primary);
+  border-radius: 0 0 8px 8px;
+  padding: 1.5rem;
+}
+
+/* تنسيقات بطاقات المنشورات المحسنة */
+.post-card {
+  transition:
+    transform var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hashtag {
+  transition: background-color var(--transition-speed) ease;
+}
+
+.hashtag:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+.comment {
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.comment:hover {
+  background-color: var(--hover-color);
+}
+
+/* تنسيقات الملف الشخصي */
+.profile-header {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--card-shadow);
+  position: sticky;
+  top: 100px;
+}
+
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-image {
+  border: 4px solid var(--accent-color);
+  border-radius: 50%;
+  transition:
+    transform var(--transition-speed) ease,
+    box-shadow var(--transition-speed) ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.profile-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card {
+  padding: 1rem;
+  border-radius: 8px;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.stat-card:hover {
+  background-color: var(--hover-color);
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Posts grid in profile */
+.posts-grid {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.post-item {
+  transition: background-color var(--transition-speed) ease;
+}
+
+.post-item:hover {
+  background-color: var(--hover-color);
+}
+
+.post-item .post-image-container img {
+  max-height: 300px;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* تنسيقات شريط البحث */
+.search-container {
+  max-width: 400px;
+  margin: 0 1rem;
+}
+
+.search-form .input-group {
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-form .form-control {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 25px 0 0 25px;
+  padding: 0.5rem 1rem;
+  border-right: none;
+}
+
+.search-form .form-control:focus {
+  background-color: var(--bg-primary);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.search-form .btn-outline-secondary {
+  background-color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  color: white;
+  border-radius: 0 25px 25px 0;
+  border-left: none;
+}
+
+.search-form .btn-outline-secondary:hover {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: white;
+}
+
+/* تنسيقات الصفحات */
+.pagination .page-link {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  transition: all var(--transition-speed) ease;
+}
+
+.pagination .page-link:hover {
+  background-color: var(--hover-color);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+/* تنسيقات التذييل */
+footer {
+  background-color: var(--bg-secondary) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: 1.5rem 0;
+  margin-top: auto;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--hover-color) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-text {
+  height: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+.skeleton-image {
+  height: 200px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* تنسيقات شريط التمرير */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+  transition: background var(--transition-speed) ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-color);
+}
+
+/* Dark Theme Styles */
+:root {
+  --bg-primary: var(--bg-primary-dark);
+  --bg-secondary: var(--bg-secondary-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+  --accent-color: var(--accent-color-dark);
+  --accent-hover: var(--accent-hover-dark);
+  --border-color: var(--border-color-dark);
+  --hover-color: var(--hover-color-dark);
+  --card-shadow: var(--card-shadow-dark);
+  --transition-speed: var(--transition-speed);
+}
+
+/* Like button animation */
+.like-btn {
+  transition: color 0.3s ease;
+}
+
+.like-btn:hover {
+  color: var(--accent-color);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-color);
+}
+
+/* Image hover effect */
+.post-image {
+  transition: transform 0.3s ease;
+}
+
+.post-image:hover {
+  transform: scale(1.02);
+}
+
+/* Comment section */
+.comment-section {
+  background-color: var(--bg-primary);
+  border-radius: 0 0 0.25rem 0.25rem;
+  padding: 1rem;
+}
+
+.comment {
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.5rem 0;
+}
+
+.comment:last-child {
+  border-bottom: none;
+}
+
+/* Profile section */
+.profile-header {
+  background-color: var(--bg-secondary);
+  border-radius: 0.25rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.profile-image {
+  border: 3px solid var(--accent-color);
+}
+
+/* Search bar */
+.search-form .form-control {
+  background-color: var(--bg-primary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.search-form .form-control:focus {
+  background-color: var(--bg-primary);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+/* Pagination */
+.pagination .page-link {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.pagination .page-link:hover {
+  background-color: var(--hover-color);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+/* Footer */
+footer {
+  background-color: var(--bg-secondary) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-header {
+    padding: 1.5rem;
+    position: static;
+    margin-bottom: 1rem;
+  }
+
+  .posts-grid {
+    max-height: none;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+  }
+
+  .navbar {
+    padding: 0.5rem 0;
+  }
+
+  .nav-link {
+    padding: 0.5rem;
+  }
+
+  .search-container {
+    margin: 1rem 0;
+    max-width: 100%;
+  }
+
+  .navbar-nav .nav-link {
+    text-align: center;
+  }
+
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+
+  .stat-card {
+    padding: 0.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar {
+    padding: 0.25rem 0;
+  }
+
+  .search-form .form-control {
+    padding: 0.375rem 0.75rem;
+  }
+
+  .search-form .btn-outline-secondary {
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+/* أنماط أزرار المتابعة */
+.btn-follow {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-follow:hover {
+  background-color: var(--primary-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-unfollow {
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-unfollow:hover {
+  background-color: var(--danger-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* أنماط قوائم المتابعين */
+.followers-list,
+.following-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.followers-list .list-group-item,
+.following-list .list-group-item {
+  transition: all 0.3s ease;
+}
+
+.followers-list .list-group-item:hover,
+.following-list .list-group-item:hover {
+  background-color: var(--bg-hover-color);
+  transform: translateX(5px);
+}
+
+.followers-list img,
+.following-list img {
+  transition: all 0.3s ease;
+}
+
+.followers-list img:hover,
+.following-list img:hover {
+  transform: scale(1.1);
+}
+
+/* أنماط عداد المتابعين */
+.followers-count,
+.following-count {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.followers-count:hover,
+.following-count:hover {
+  color: var(--primary-hover-color);
+}

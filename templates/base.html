@@ -1,0 +1,260 @@
+{% load i18n %}
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="{% translate 'منصة تواصل اجتماعي لمشاركة المنشورات والتواصل مع الأصدقاء' %}"
+    />
+    <meta name="theme-color" content="#007bff" />
+    <title>{% translate "منصة التواصل الاجتماعي" %}</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
+      rel="preload"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
+    /></noscript>
+    {% load static %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{% url 'posts:post_list' %}">
+          <i class="fas fa-globe-americas me-2"></i>
+          {% translate "منصتي" %}
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'posts:post_list' %}"
+                aria-label="Home"
+              >
+                <i class="fas fa-home me-1"></i>
+                {% translate "الرئيسية" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'posts:post_create' %}"
+                aria-label="Create Post"
+              >
+                <i class="fas fa-plus-circle me-1"></i>
+                {% translate "منشور جديد" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'posts:stories_list' %}"
+                aria-label="Stories"
+              >
+                <i class="fas fa-camera me-1"></i>
+                {% translate "القصص" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link position-relative"
+                href="{% url 'notifications:notification_list' %}"
+                aria-label="Notifications"
+              >
+                <i class="fas fa-bell me-1"></i>
+                {% translate "الإشعارات" %} {% with
+                unread_count=user.notifications.filter|length %} {% if
+                unread_count > 0 %}
+                <span class="notifications-badge">{{ unread_count }}</span>
+                {% endif %} {% endwith %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'direct_messages:inbox' %}"
+                aria-label="Messages"
+              >
+                <i class="fas fa-envelope me-1"></i>
+                {% translate "الرسائل" %}
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+          {% if user.is_authenticated %}
+          <div class="d-flex search-container">
+            <form
+              class="d-flex search-form"
+              action="{% url 'posts:search' %}"
+              method="get"
+            >
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  type="search"
+                  placeholder="{% translate 'ابحث عن منشورات أو مستخدمين...' %}"
+                  name="q"
+                  aria-label="Search"
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="submit"
+                  aria-label="Search"
+                >
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'users:profile' %}"
+                aria-label="Profile"
+              >
+                <i class="fas fa-user-circle me-1"></i>
+                {% translate "الملف الشخصي" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'users:logout' %}"
+                aria-label="Logout"
+              >
+                <i class="fas fa-sign-out-alt me-1"></i>
+                {% translate "تسجيل خروج" %}
+              </a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'users:login' %}"
+                aria-label="Login"
+              >
+                <i class="fas fa-sign-in-alt me-1"></i>
+                {% translate "تسجيل دخول" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'users:register' %}"
+                aria-label="Register"
+              >
+                <i class="fas fa-user-plus me-1"></i>
+                {% translate "تسجيل جديد" %}
+              </a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+              <button
+                id="theme-switcher"
+                class="btn nav-link"
+                aria-label="Toggle Theme"
+              >
+                <i class="fas fa-moon"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mt-4 flex-grow-1">
+      {% if messages %} {% for message in messages %}
+      <div
+        class="alert {{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {% if message.tags == 'success' %}
+        <i class="fas fa-check-circle me-2"></i>
+        {% elif message.tags == 'danger' %}
+        <i class="fas fa-exclamation-circle me-2"></i>
+        {% elif message.tags == 'warning' %}
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {% elif message.tags == 'info' %}
+        <i class="fas fa-info-circle me-2"></i>
+        {% endif %} {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% block content %} {% endblock %}
+    </main>
+
+    <footer>
+      <div class="container text-center">
+        <div class="social-links mb-3">
+          <a href="#" class="text-secondary me-3">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="text-secondary me-3">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="text-secondary me-3">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="text-secondary">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+        <span>{% translate "جميع الحقوق محفوظة © 2024" %}</span>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% if user.is_authenticated %}
+    <script>
+      const notificationSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/notifications/",
+      );
+
+      notificationSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        if (data.type === "notification") {
+          // Show notification (you can enhance this with a toast or modal)
+          showNotification(data.notification.message);
+        }
+      };
+
+      function showNotification(message) {
+        // Simple alert for now - can be replaced with a better UI
+        alert("إشعار جديد: " + message);
+      }
+    </script>
+    {% endif %}
+  </body>
+</html>

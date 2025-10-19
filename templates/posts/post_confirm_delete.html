@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">حذف المنشور</h2>
+                    <p class="mb-4">هل أنت متأكد من حذف هذا المنشور؟</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" class="btn btn-danger">نعم، احذف</button>
+                            <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-secondary">لا، عودة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

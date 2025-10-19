@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}الإشعارات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">الإشعارات</h4>
+                    {% if unread_count > 0 %}
+                    <button class="btn btn-sm btn-primary mark-all-read">
+                        تحديد الكل كمقروء
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                        <div class="notification-item {% if not notification.is_read %}unread{% endif %} mb-3 p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ notification.sender.profile.profile_picture.url }}" 
+                                         class="rounded-circle me-2" 
+                                         width="40" 
+                                         height="40"
+                                         alt="{{ notification.sender.username }}">
+                                    <div>
+                                        <div class="notification-text">
+                                            {{ notification.text }}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ notification.created_at|timesince }}
+                                        </small>
+                                    </div>
+                                </div>
+                                {% if not notification.is_read %}
+                                <button class="btn btn-sm btn-light mark-read" 
+                                        data-notification-id="{{ notification.id }}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if notifications.has_other_pages %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if notifications.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.previous_page_number }}">
+                                        السابق
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in notifications.paginator.page_range %}
+                                <li class="page-item {% if notifications.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                                {% endfor %}
+
+                                {% if notifications.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.next_page_number }}">
+                                        التالي
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <p>لا توجد إشعارات جديدة</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.notification-item {
+    transition: background-color 0.3s;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+}
+
+.notification-item:hover {
+    background-color: #f1f3f5;
+}
+
+.notification-text {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.mark-read {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.notification-item:hover .mark-read {
+    opacity: 1;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // تحديد إشعار كمقروء
+    $('.mark-read').click(function() {
+        var button = $(this);
+        var notificationId = button.data('notification-id');
+        
+        $.post("{% url 'notifications:mark_as_read' 0 %}".replace('0', notificationId), {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(response) {
+            button.closest('.notification-item').removeClass('unread');
+            button.remove();
+            updateUnreadCount();
+        });
+    });
+    
+    // تحديد جميع الإشعارات كمقروءة
+    $('.mark-all-read').click(function() {
+        $.post("{% url 'notifications:mark_all_as_read' %}", {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(response) {
+            $('.notification-item').removeClass('unread');
+            $('.mark-read').remove();
+            updateUnreadCount();
+        });
+    });
+    
+    // تحديث عدد الإشعارات غير المقروءة
+    function updateUnreadCount() {
+        $.get("{% url 'notifications:get_unread_count' %}")
+        .done(function(response) {
+            var count = response.count;
+            var badge = $('.notifications-badge');
+            
+            if (count > 0) {
+                badge.text(count).show();
+            } else {
+                badge.hide();
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header text-center">
+          <h3>{% translate "إرسال تقرير" %}</h3>
+        </div>
+        <div class="card-body">
+          <p>{% translate "الإبلاغ عن" %}: {{ object }}</p>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="reason" class="form-label"
+                >{% translate "سبب التقرير" %}</label
+              >
+              <select name="reason" class="form-select" required>
+                <option value="spam">سبام</option>
+                <option value="harassment">تحرش</option>
+                <option value="inappropriate">محتوى غير مناسب</option>
+                <option value="other">أخرى</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label"
+                >{% translate "وصف التقرير" %}</label
+              >
+              <textarea
+                name="description"
+                class="form-control"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger w-100">
+              {% translate "إرسال التقرير" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

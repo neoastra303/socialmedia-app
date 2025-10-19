@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title">{{ post.author.username }}</h5>
+                        <small class="text-muted">{{ post.created_at|date:"j F Y" }}</small>
+                    </div>
+                    <p class="card-text">{{ post.content }}</p>
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="صورة المنشور">
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button class="btn btn-outline-primary btn-sm like-button" data-post-id="{{ post.id }}">
+                                <i class="fas fa-heart {% if request.user in post.likes.all %}text-danger{% endif %}"></i>
+                                <span class="like-count">{{ post.total_likes }}</span>
+                            </button>
+                            <span class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-comment"></i>
+                                {{ post.comments.count }}
+                            </span>
+                        </div>
+                        {% if post.author == request.user %}
+                        <div>
+                            <a href="{% url 'posts:post_edit' post.id %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'posts:post_delete' post.id %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">التعليقات</h5>
+                    {% if user.is_authenticated %}
+                    <form method="POST" class="mb-4">
+                        {% csrf_token %}
+                        {{ comment_form|crispy }}
+                        <button type="submit" class="btn btn-primary">إضافة تعليق</button>
+                    </form>
+                    {% else %}
+                    <p class="text-center mb-4">
+                        <a href="{% url 'users:login' %}">سجل دخولك</a> لإضافة تعليق
+                    </p>
+                    {% endif %}
+
+                    {% for comment in comments %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ comment.author.username }}</h6>
+                            <small class="text-muted">{{ comment.created_at|date:"j F Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ comment.content }}</p>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
+                    {% empty %}
+                    <p class="text-center">لا توجد تعليقات بعد</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <h2>{% translate "إدارة التقارير" %}</h2>
+  <div class="row">
+    {% for report in reports %}
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h5>{{ report.reason }}</h5>
+          <p>{{ report.description|truncatechars:100 }}</p>
+          <small
+            >{% translate "من" %}: {{ report.reporter.username }} - {{
+            report.created_at|timesince }}</small
+          >
+          <br />
+          <small>{% translate "الحالة" %}: {{ report.status }}</small>
+          <br />
+          <a
+            href="{% url 'reports:resolve_report' report.id %}"
+            class="btn btn-sm btn-primary mt-2"
+            >{% translate "مراجعة" %}</a
+          >
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center">لا توجد تقارير</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

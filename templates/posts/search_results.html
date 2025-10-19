@@ -1,0 +1,192 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">{% translate "نتائج البحث" %}</h2>
+
+      <!-- Search Form -->
+      <form method="get" class="mb-4">
+        <div class="input-group">
+          <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="form-control"
+            placeholder="{% translate 'ابحث عن منشورات أو مستخدمين...' %}"
+          />
+          <select name="type" class="form-select" style="max-width: 200px">
+            <option
+              value="all"
+              {%
+              if
+              filter_type=""
+              ="all"
+              %}selected{%
+              endif
+              %}
+            >
+              {% translate "الكل" %}
+            </option>
+            <option
+              value="posts"
+              {%
+              if
+              filter_type=""
+              ="posts"
+              %}selected{%
+              endif
+              %}
+            >
+              {% translate "المنشورات" %}
+            </option>
+            <option
+              value="users"
+              {%
+              if
+              filter_type=""
+              ="users"
+              %}selected{%
+              endif
+              %}
+            >
+              {% translate "المستخدمون" %}
+            </option>
+          </select>
+          <button type="submit" class="btn btn-primary">
+            {% translate "بحث" %}
+          </button>
+        </div>
+      </form>
+
+      {% if query %}
+      <!-- Users Results -->
+      {% if users %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h4>{% translate "المستخدمون" %}</h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for user in users %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <img
+                    src="{{ user.profile.image.url }}"
+                    alt="{{ user.username }}"
+                    class="rounded-circle mb-2"
+                    width="60"
+                    height="60"
+                  />
+                  <h6>
+                    <a
+                      href="{% url 'users:profile' user.username %}"
+                      class="text-decoration-none"
+                      >{{ user.username }}</a
+                    >
+                  </h6>
+                  {% if user.profile.bio %}
+                  <p class="text-muted small">
+                    {{ user.profile.bio|truncatechars:50 }}
+                  </p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Posts Results -->
+      {% if posts %}
+      <div class="card">
+        <div class="card-header">
+          <h4>{% translate "المنشورات" %}</h4>
+        </div>
+        <div class="card-body">
+          {% for post in posts %}
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-2">
+                <img
+                  src="{{ post.author.profile.image.url }}"
+                  alt="{{ post.author.username }}"
+                  class="rounded-circle me-2"
+                  width="30"
+                  height="30"
+                />
+                <a
+                  href="{% url 'users:profile' post.author.username %}"
+                  class="text-decoration-none"
+                  >{{ post.author.username }}</a
+                >
+                <small class="text-muted ms-2"
+                  >{{ post.created_at|date:"j F Y" }}</small
+                >
+              </div>
+              <p>{{ post.content|truncatechars:200 }}</p>
+              {% if post.image %}
+              <img
+                src="{{ post.image.url }}"
+                class="img-fluid rounded mb-2"
+                alt="صورة المنشور"
+              />
+              {% endif %}
+              <a
+                href="{% url 'posts:post_detail' post.id %}"
+                class="btn btn-sm btn-outline-primary"
+                >{% translate "عرض التفاصيل" %}</a
+              >
+            </div>
+          </div>
+          {% endfor %} {% if posts.has_other_pages %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              {% if posts.has_previous %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?q={{ query }}&type={{ filter_type }}&page={{ posts.previous_page_number }}"
+                  >{% translate "السابق" %}</a
+                >
+              </li>
+              {% endif %} {% for num in posts.paginator.page_range %} {% if
+              posts.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+              {% elif num > posts.number|add:'-3' and num < posts.number|add:'3'
+              %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?q={{ query }}&type={{ filter_type }}&page={{ num }}"
+                  >{{ num }}</a
+                >
+              </li>
+              {% endif %} {% endfor %} {% if posts.has_next %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?q={{ query }}&type={{ filter_type }}&page={{ posts.next_page_number }}"
+                  >{% translate "التالي" %}</a
+                >
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %} {% if not users and not posts %}
+      <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <p>{% translate "لا توجد نتائج للبحث عن" %} "{{ query }}"</p>
+      </div>
+      {% endif %} {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

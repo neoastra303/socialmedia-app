@@ -1,0 +1,11 @@
+  1. Install Dependencies: (Failed, attempting to resolve)
+       * Action: Upgrade pip and setuptools.
+   2. Create `logs` directory: (Completed)
+   3. PostgreSQL Database Setup: (Requires user action/external setup)
+   4. Redis Server Setup: (Requires user action/external setup)
+   5. Code Quality Tools Usage: (Requires user action/external setup)
+   6. Automated Testing & CI/CD: (Requires user action/external setup)
+   7. Error Monitoring: (Requires user action/external setup)
+   8. Dependency Security Audits: (Requires user action/external setup)
+   9. Static and Media File Serving: (Requires user action/external setup)
+   10. Deployment Strategy: (Requires user action/external setup)

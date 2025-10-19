@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}المنشورات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="mb-4">
+                <a href="{% url 'posts:post_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> إنشاء منشور جديد
+                </a>
+            </div>
+
+            {% for post in posts %}
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <img src="{{ post.author.profile.profile_picture.url }}" class="rounded-circle" width="40">
+                        <a href="{% url 'users:profile' post.author.username %}" class="text-dark mr-2">
+                            {{ post.author.username }}
+                        </a>
+                    </div>
+                    <small class="text-muted">{{ post.created_at|timesince }}</small>
+                </div>
+
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="صورة المنشور">
+                {% endif %}
+
+                <div class="card-body">
+                    <p class="card-text">{{ post.content }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary like-button" 
+                                    data-post-id="{{ post.id }}"
+                                    data-liked="{% if request.user in post.likes.all %}true{% else %}false{% endif %}">
+                                <i class="fas fa-heart"></i> 
+                                <span class="likes-count">{{ post.total_likes }}</span>
+                            </button>
+                            <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-comment"></i> 
+                                {{ post.comments.count }}
+                            </a>
+                        </div>
+                        
+                        {% if post.author == request.user %}
+                        <div class="btn-group">
+                            <a href="{% url 'posts:post_edit' post.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i> تعديل
+                            </a>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger delete-post" 
+                                    data-post-id="{{ post.id }}">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                لا توجد منشورات حتى الآن.
+            </div>
+            {% endfor %}
+
+            {% if posts.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.previous_page_number }}">السابق</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in posts.paginator.page_range %}
+                    <li class="page-item {% if posts.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.next_page_number }}">التالي</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Like functionality
+    $('.like-button').click(function() {
+        var button = $(this);
+        var postId = button.data('post-id');
+        
+        $.post("{% url 'posts:like_post' %}", {
+            'post_id': postId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(response) {
+            button.find('.likes-count').text(response.total_likes);
+            if (response.liked) {
+                button.addClass('active');
+            } else {
+                button.removeClass('active');
+            }
+        });
+    });
+
+    // Delete post functionality
+    $('.delete-post').click(function() {
+        if (confirm('هل أنت متأكد من حذف هذا المنشور؟')) {
+            var postId = $(this).data('post-id');
+            var form = $('<form method="POST" action="/posts/' + postId + '/delete/">')
+                .append('{% csrf_token %}');
+            $('body').append(form);
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

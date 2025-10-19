@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{% translate "القصص" %}</h2>
+    <a href="{% url 'posts:create_story' %}" class="btn btn-primary"
+      >{% translate "إضافة قصة" %}</a
+    >
+  </div>
+  <div class="row">
+    {% for story in stories %}
+    <div class="col-md-3 mb-4">
+      <div class="card">
+        <div class="card-body text-center">
+          {% if story.image %}
+          <img
+            src="{{ story.image.url }}"
+            class="img-fluid rounded mb-2"
+            alt="قصة"
+            style="height: 200px; object-fit: cover"
+          />
+          {% elif story.video %}
+          <video
+            class="img-fluid rounded mb-2"
+            style="height: 200px; object-fit: cover"
+            controls
+          >
+            <source src="{{ story.video.url }}" type="video/mp4" />
+          </video>
+          {% endif %}
+          <h6>{{ story.author.username }}</h6>
+          <p>{{ story.content|truncatechars:50 }}</p>
+          <small class="text-muted">{{ story.created_at|timesince }}</small>
+          <br />
+          <a
+            href="{% url 'posts:view_story' story.id %}"
+            class="btn btn-sm btn-outline-primary mt-2"
+            >{% translate "عرض القصة" %}</a
+          >
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center">لا توجد قصص نشطة</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

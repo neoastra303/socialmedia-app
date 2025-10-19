@@ -1,0 +1,4 @@
+{% autoescape off %} مرحبا {{ user.username }}، يرجى النقر على الرابط التالي
+لتفعيل حسابك في منصتي: http://{{ domain }}{% url 'users:activate' uidb64=uid
+token=token %} إذا لم تطلب إنشاء حساب، يمكنك تجاهل هذا البريد. مع خالص التحية،
+فريق منصتي {% endautoescape %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% load i18n %} {% block content %}
+<div class="container">
+  <h2>{% translate "محادثة مع" %} {{ other_user.username }}</h2>
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-body" style="height: 400px; overflow-y: auto">
+          {% for message in messages %}
+          <div
+            class="mb-3 {% if message.sender == request.user %}text-end{% endif %}"
+          >
+            <div
+              class="d-inline-block p-2 rounded {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}"
+            >
+              <strong>{{ message.sender.username }}</strong><br />
+              {{ message.content }}
+              <small class="d-block">{{ message.timestamp|timesince }}</small>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="card-footer">
+          <form method="post">
+            {% csrf_token %}
+            <div class="input-group">
+              <input
+                type="text"
+                name="content"
+                class="form-control"
+                placeholder="{% translate 'اكتب رسالة...' %}"
+                required
+              />
+              <button type="submit" class="btn btn-primary">
+                {% translate "إرسال" %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
