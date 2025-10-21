@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator
+from django.core.exceptions import ValidationError
 
 class Conversation(models.Model):
     participants = models.ManyToManyField(User, related_name='conversations')
@@ -24,9 +26,25 @@ class Conversation(models.Model):
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    content = models.TextField()
+    content = models.TextField(
+        max_length=5000,
+        validators=[MinLengthValidator(1, message="Message content cannot be empty.")]
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+
+    def clean(self):
+        """Custom validation for the Message model"""
+        super().clean()
+        if self.content and len(self.content.strip()) < 1:
+            raise ValidationError("Message content cannot be empty or just whitespace.")
+        
+        if len(self.content) > 5000:
+            raise ValidationError("Message content cannot exceed 5000 characters.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['timestamp']

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'Rate Limit Exceeded' %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h1 class="card-title text-danger">429</h1>
+                    <h3 class="card-subtitle mb-3">{% trans 'Rate Limit Exceeded' %}</h3>
+                    <p class="card-text">
+                        {% trans 'You have exceeded the rate limit. Please wait before making more requests.' %}
+                        {% if rate_limit %}
+                            <br>
+                            {% blocktrans with rate_limit=rate_limit %}Rate limit: {{ rate_limit }}{% endblocktrans %}
+                        {% endif %}
+                        {% if retry_after %}
+                            <br>
+                            {% blocktrans with retry_after=retry_after %}Please try again after {{ retry_after }}.{% endblocktrans %}
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'posts:post_list' %}" class="btn btn-primary">{% trans 'Go Home' %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

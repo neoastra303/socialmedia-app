@@ -5,7 +5,8 @@ from django.dispatch import receiver
 from PIL import Image
 import os
 from background_task import background
-from .tasks import process_profile_image
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 
 class Profile(models.Model):
     """
@@ -23,7 +24,11 @@ class Profile(models.Model):
         email_verified (BooleanField): Whether the user's email is verified
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    image = models.ImageField(
+        default='default.jpg', 
+        upload_to='profile_pics',
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+    )
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -36,14 +41,33 @@ class Profile(models.Model):
         """String representation of the Profile model."""
         return f'{self.user.username} Profile'
 
+    def clean(self):
+        """Custom validation for the Profile model"""
+        super().clean()
+        if self.bio and len(self.bio) > 500:
+            raise ValidationError("Bio cannot exceed 500 characters.")
+        
+        if self.location and len(self.location) > 100:
+            raise ValidationError("Location cannot exceed 100 characters.")
+        
+        if self.image and self.image.size:
+            max_size = 5 * 1024 * 1024  # 5MB
+            if self.image.size > max_size:
+                raise ValidationError(f'Profile image too large. Size should not exceed 5MB.')
+
     def save(self, *args, **kwargs):
+        self.full_clean()
         super().save(*args, **kwargs)
         # Schedule background task for image processing
         if self.image:
+            from .tasks import process_profile_image
             process_profile_image(self.id, schedule=0)
 
     def follow(self, user):
         if user != self.user:
+            # Prevent users from following themselves
+            if user == self.user:
+                return False
             self.following.add(user.profile)
             return True
         return False
@@ -60,14 +84,6 @@ class Profile(models.Model):
     def following_count(self):
         return self.following.count()
 
-# Create a Profile automatically when a User is created
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
 
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 

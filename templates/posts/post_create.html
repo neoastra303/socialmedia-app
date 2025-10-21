@@ -1,23 +1,22 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load i18n %}
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title mb-4">إنشاء منشور جديد</h2>
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">نشر</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-header">
+        <h3>{% translate "منشور جديد" %}</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <button type="submit" class="btn btn-primary w-100">{% translate "نشر" %}</button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %} 
+{% endblock %}

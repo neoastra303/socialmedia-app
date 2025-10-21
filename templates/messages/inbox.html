@@ -1,38 +1,68 @@
-{% extends "base.html" %} {% load i18n %} {% block content %}
-<div class="container">
-  <h2>{% translate "الرسائل" %}</h2>
-  <div class="row">
-    <div class="col-md-4">
-      <div class="list-group">
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>{% translate "المحادثات" %}</h5>
+      </div>
+      <div class="list-group list-group-flush">
         {% for conversation in conversations %}
-        <a
-          href="{% url 'messages:conversation_detail' conversation.participants.exclude(id=request.user.id).first.username %}"
-          class="list-group-item list-group-item-action"
-        >
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">
-              {{
-              conversation.participants.exclude(id=request.user.id).first.username
-              }}
-            </h5>
-            <small>{{ conversation.updated_at|timesince }}</small>
+        {% with other_user=conversation.participants.exclude(id=request.user.id).first %}
+        {% if other_user %}
+        <a href="{% url 'direct_messages:conversation_detail' other_user.username %}" class="list-group-item list-group-item-action">
+          <div class="d-flex align-items-center">
+            <img src="{{ other_user.profile.image.url }}" class="rounded-circle me-2" width="40" height="40" alt="{{ other_user.username }}">
+            <div>
+              <h6 class="mb-0">{{ other_user.username }}</h6>
+              <small class="text-muted">
+                {% with last_message=conversation.messages.last %}
+                {% if last_message %}
+                {{ last_message.content|truncatechars:30 }}
+                {% else %}
+                {% translate "ابدأ المحادثة" %}
+                {% endif %}
+                {% endwith %}
+              </small>
+            </div>
           </div>
-          <p class="mb-1">
-            {{ conversation.messages.last.content|truncatechars:50 }}
-          </p>
         </a>
+        {% endif %}
+        {% endwith %}
         {% empty %}
-        <p class="text-center">لا توجد محادثات</p>
+        <div class="p-3 text-center">
+          <p>{% translate "لا توجد محادثات بعد." %}</p>
+        </div>
         {% endfor %}
       </div>
     </div>
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-body">
-          <h5>اختر محادثة لعرض الرسائل</h5>
-        </div>
+  </div>
+  
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5>{% translate "ابدأ محادثة جديدة" %}</h5>
+      </div>
+      <div class="card-body">
+        <form method="get" action="{% url 'direct_messages:conversation_detail' 'username' %}">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="{% translate 'اسم المستخدم' %}" id="username-input">
+            <button class="btn btn-primary" type="button" id="start-chat-btn">{% translate "ابدأ المحادثة" %}</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.getElementById('start-chat-btn').addEventListener('click', function() {
+    const username = document.getElementById('username-input').value.trim();
+    if (username) {
+      window.location.href = '{% url "direct_messages:conversation_detail" "username_placeholder" %}'.replace('username_placeholder', username);
+    }
+  });
+</script>
 {% endblock %}

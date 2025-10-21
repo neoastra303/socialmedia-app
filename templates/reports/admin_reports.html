@@ -1,31 +1,61 @@
-{% extends "base.html" %} {% load i18n %} {% block content %}
-<div class="container">
-  <h2>{% translate "إدارة التقارير" %}</h2>
-  <div class="row">
-    {% for report in reports %}
-    <div class="col-md-6 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <h5>{{ report.reason }}</h5>
-          <p>{{ report.description|truncatechars:100 }}</p>
-          <small
-            >{% translate "من" %}: {{ report.reporter.username }} - {{
-            report.created_at|timesince }}</small
-          >
-          <br />
-          <small>{% translate "الحالة" %}: {{ report.status }}</small>
-          <br />
-          <a
-            href="{% url 'reports:resolve_report' report.id %}"
-            class="btn btn-sm btn-primary mt-2"
-            >{% translate "مراجعة" %}</a
-          >
-        </div>
-      </div>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h2>{% translate "تقارير المشرف" %}</h2>
+    
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>{% translate "المبلغ" %}</th>
+            <th>{% translate "الهدف" %}</th>
+            <th>{% translate "السبب" %}</th>
+            <th>{% translate "الحالة" %}</th>
+            <th>{% translate "التاريخ" %}</th>
+            <th>{% translate "الإجراءات" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for report in reports %}
+          <tr>
+            <td>{{ report.reporter.username }}</td>
+            <td>
+              {% if report.reported_user %}
+                {% translate "المستخدم:" %} {{ report.reported_user.username }}
+              {% elif report.reported_post %}
+                {% translate "المنشور:" %} {{ report.reported_post.content|truncatechars:50 }}
+              {% elif report.reported_comment %}
+                {% translate "التعليق:" %} {{ report.reported_comment.content|truncatechars:50 }}
+              {% endif %}
+            </td>
+            <td>{{ report.get_reason_display }}</td>
+            <td>
+              <span class="badge 
+                {% if report.status == 'pending' %}bg-warning
+                {% elif report.status == 'resolved' %}bg-success
+                {% elif report.status == 'dismissed' %}bg-secondary
+                {% endif %}">
+                {{ report.get_status_display }}
+              </span>
+            </td>
+            <td>{{ report.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+              {% if report.status == 'pending' %}
+                <a href="{% url 'reports:resolve_report' report.id %}" class="btn btn-sm btn-primary">{% translate "حل" %}</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">{% translate "لا توجد تقارير." %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    {% empty %}
-    <p class="text-center">لا توجد تقارير</p>
-    {% endfor %}
   </div>
 </div>
 {% endblock %}

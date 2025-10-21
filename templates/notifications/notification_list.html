@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <h2>{% translate "الإشعارات" %}</h2>
+    
+    {% for notification in notifications %}
+    <div class="card mb-2 {% if not notification.is_read %}bg-light{% endif %}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <p class="card-text">{{ notification.message }}</p>
+            <small class="text-muted">{{ notification.created_at|date:"M d, Y H:i" }}</small>
+          </div>
+          {% if not notification.is_read %}
+          <form method="post" action="{% url 'notifications:mark_read' notification.id %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-secondary">{% translate "تم القراءة" %}</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p>{% translate "لا توجد إشعارات." %}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

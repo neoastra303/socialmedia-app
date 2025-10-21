@@ -57,6 +57,7 @@ INSTALLED_APPS = [
      'notifications.apps.NotificationsConfig',
      'direct_messages.apps.DirectMessagesConfig',
      'reports.apps.ReportsConfig',
+     'searchapp.apps.SearchappConfig',
      'crispy_forms',
      'crispy_bootstrap5',
      'django_ratelimit',
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Only add whitenoise in production environments
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -73,7 +75,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.exception_handler.GlobalExceptionHandlerMiddleware',
+    'middleware.exception_handler.ValidationMiddleware',
 ]
+
+# Add whitenoise middleware only if needed
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+else:
+    # In development, add static file serving
+    pass  # Django's development server handles static files automatically
 
 ROOT_URLCONF = 'socialmediaproject.urls'
 
@@ -156,11 +167,19 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
 
 # Media files (Uploaded files)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files for production vs development
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
+    # Static files storage for production
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    # In development, don't set STATIC_ROOT so Django serves files automatically
+    pass
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -198,6 +217,12 @@ CACHES = {
     }
 }
 
+# Rate Limiting Configuration
+RATELIMIT_CACHE_PREFIX = 'rl:'
+RATELIMIT_BLOCK = True  # Whether to block requests that exceed the rate limit
+RATELIMIT_USE_CACHE = 'default'  # Use the default cache
+RATELIMIT_VIEW = 'middleware.rate_limiting.custom_ratelimit'  # Custom rate limit view
+
 # Channels
 # Channels
 # For production, use Redis for the channel layer.
@@ -219,6 +244,25 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+# Security Settings
+if not DEBUG:
+    # Security settings for production
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_REDIRECT_EXEMPT = []
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    # For development, use less restrictive settings
+    X_FRAME_OPTIONS = 'DENY'  # Still important to prevent clickjacking
+    SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
 
 # Logging configuration
 # Logging configuration

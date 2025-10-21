@@ -1,11 +1,12 @@
 from background_task import background
-from .models import Profile
+from django.apps import apps
 from PIL import Image
 import os
 
 @background(schedule=0)
 def process_profile_image(profile_id):
     try:
+        Profile = apps.get_model('users', 'Profile')
         profile = Profile.objects.get(id=profile_id)
         if profile.image and os.path.exists(profile.image.path):
             img = Image.open(profile.image.path)

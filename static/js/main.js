@@ -1,103 +1,101 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const themeSwitcher = document.getElementById("theme-switcher");
-  const body = document.body;
-
-  const currentTheme = localStorage.getItem("theme") || "light";
-  body.classList.add(`${currentTheme}-theme`);
-  themeSwitcher.innerHTML =
-    currentTheme === "dark"
-      ? '<i class="fas fa-sun"></i>'
-      : '<i class="fas fa-moon"></i>';
-
-  themeSwitcher.addEventListener("click", () => {
-    body.classList.toggle("dark-theme");
-    body.classList.toggle("light-theme");
-
-    let theme = "dark";
-    if (body.classList.contains("light-theme")) {
-      theme = "light";
+// Theme switcher functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const themeSwitcher = document.getElementById('theme-switcher');
+    const body = document.body;
+    const themeKey = 'theme-preference';
+    
+    // Load saved theme from localStorage
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) {
+        body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
     }
-
-    localStorage.setItem("theme", theme);
-    themeSwitcher.innerHTML =
-      theme === "dark"
-        ? '<i class="fas fa-sun"></i>'
-        : '<i class="fas fa-moon"></i>';
-  });
-
-  // Reaction button functionality
-  document.querySelectorAll(".reaction-btn").forEach((button) => {
-    button.addEventListener("click", function (e) {
-      e.preventDefault();
-      const postId = this.dataset.postId;
-      const reaction = this.dataset.reaction;
-      const dropdown = this.closest(".dropdown");
-      const toggle = dropdown.querySelector(".dropdown-toggle");
-      const count = toggle.querySelector(".reaction-count");
-
-      fetch(`/posts/${postId}/react/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
-            .value,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `reaction=${reaction}`,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          count.textContent = data.total_reactions;
-          if (data.reacted) {
-            // Update button icon
-            const icon = {
-              like: "👍",
-              love: "❤️",
-              laugh: "😂",
-              angry: "😠",
-              sad: "😢",
-            }[data.reaction_type];
-            toggle.innerHTML = `${icon} <span class="reaction-count">${data.total_reactions}</span>`;
-          } else {
-            toggle.innerHTML = `👍 <span class="reaction-count">${data.total_reactions}</span>`;
-          }
-        })
-        .catch((error) => console.error("Error:", error));
+    
+    // Toggle theme
+    themeSwitcher.addEventListener('click', function() {
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem(themeKey, newTheme);
+        updateThemeIcon(newTheme);
     });
-  });
-
-  // Form validation for registration and profile update
-  const forms = document.querySelectorAll("form");
-  forms.forEach((form) => {
-    form.addEventListener("submit", function (e) {
-      const requiredFields = form.querySelectorAll("[required]");
-      let valid = true;
-      requiredFields.forEach((field) => {
-        if (!field.value.trim()) {
-          field.classList.add("is-invalid");
-          valid = false;
+    
+    function updateThemeIcon(theme) {
+        const icon = themeSwitcher.querySelector('i');
+        if (theme === 'dark') {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
         } else {
-          field.classList.remove("is-invalid");
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
         }
-      });
-      if (!valid) {
-        e.preventDefault();
-        alert("Please fill in all required fields.");
-      }
-    });
-  });
-
-  // Image preview for profile picture upload
-  const imageInput = document.querySelector('input[type="file"][name="image"]');
-  if (imageInput) {
-    imageInput.addEventListener("change", function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          document.querySelector(".profile-img-preview").src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
+    }
 });
+
+// Auto-hide alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+});
+
+// AJAX reaction handling
+document.addEventListener('DOMContentLoaded', function() {
+    const reactionButtons = document.querySelectorAll('.reactions form');
+    reactionButtons.forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const url = form.getAttribute('action');
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload(); // Simple reload for now
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+// Form submission with AJAX
+function submitFormWithAjax(formId, successCallback) {
+    const form = document.getElementById(formId);
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const url = form.getAttribute('action');
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && successCallback) {
+                    successCallback(data);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+}

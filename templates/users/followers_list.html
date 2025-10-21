@@ -1,45 +1,37 @@
-{% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% extends 'base.html' %}
+{% load i18n %}
 
 {% block content %}
-<div class="container">
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <h2>
+      {% blocktranslate with username=user.username %}
+        متابعو {{ username }}
+      {% endblocktranslate %}
+    </h2>
+    
     <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">متابعي {{ user.username }}</h3>
-                </div>
-                <div class="card-body">
-                    {% if followers %}
-                        <div class="list-group">
-                            {% for follower in followers %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ follower.user.profile.image.url }}" alt="{{ follower.user.username }}" class="rounded-circle me-2" width="40" height="40">
-                                        <a href="{% url 'users:profile' follower.user.username %}" class="text-decoration-none">
-                                            {{ follower.user.username }}
-                                        </a>
-                                    </div>
-                                    {% if user != request.user %}
-                                        {% if request.user.profile in user.profile.followers.all %}
-                                            <a href="{% url 'users:unfollow_user' follower.user.username %}" class="btn btn-sm btn-outline-danger">
-                                                إلغاء المتابعة
-                                            </a>
-                                        {% else %}
-                                            <a href="{% url 'users:follow_user' follower.user.username %}" class="btn btn-sm btn-primary">
-                                                متابعة
-                                            </a>
-                                        {% endif %}
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-center mb-0">لا يوجد متابعين</p>
-                    {% endif %}
-                </div>
+      {% for follower in followers %}
+      <div class="col-md-6 mb-3">
+        <div class="card">
+          <div class="card-body d-flex align-items-center">
+            <img src="{{ follower.user.profile.image.url }}" class="rounded-circle me-3" width="50" height="50" alt="{{ follower.user.username }}">
+            <div>
+              <h6 class="mb-0">{{ follower.user.username }}</h6>
+              <p class="text-muted small mb-1">{{ follower.user.profile.bio|default:""|truncatechars:50 }}</p>
+              <a href="{% url 'users:profile' follower.user.username %}" class="btn btn-sm btn-outline-primary">{% translate "الملف الشخصي" %}</a>
             </div>
+          </div>
         </div>
+      </div>
+      {% empty %}
+      <div class="col-md-12">
+        <p class="text-muted text-center">{% translate "لا يوجد متابعون بعد." %}</p>
+      </div>
+      {% endfor %}
     </div>
+    
+    <a href="{% url 'users:profile' user.username %}" class="btn btn-secondary">{% translate "العودة إلى الملف الشخصي" %}</a>
+  </div>
 </div>
-{% endblock content %} 
+{% endblock %}

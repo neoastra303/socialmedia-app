@@ -50,7 +50,8 @@ dmypy.json
 *.js.map
 *.css.map
 db.sqlite3
-/media
+media/
+!media/.gitkeep
 
 # Jupyter Notebook
 .ipynb_checkpoints

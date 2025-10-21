@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
 from .models import Conversation, Message
+from .forms import MessageForm
 from django.contrib.auth.models import User
 from notifications.utils import send_notification
 
@@ -18,13 +19,12 @@ def conversation_detail(request, username):
     conversation, created = Conversation.objects.get_or_create_for_users(request.user, other_user)
 
     if request.method == 'POST':
-        content = request.POST.get('content')
-        if content:
-            message = Message.objects.create(
-                conversation=conversation,
-                sender=request.user,
-                content=content
-            )
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.conversation = conversation
+            message.sender = request.user
+            message.save()
             # Send notification
             send_notification(
                 other_user,
@@ -33,12 +33,15 @@ def conversation_detail(request, username):
                 related_user=request.user
             )
             return redirect('messages:conversation_detail', username=username)
+    else:
+        form = MessageForm()
 
     messages_list = conversation.messages.all()
     return render(request, 'messages/conversation.html', {
         'conversation': conversation,
         'messages': messages_list,
-        'other_user': other_user
+        'other_user': other_user,
+        'form': form
     })
 
 @login_required

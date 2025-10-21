@@ -1,41 +1,48 @@
-{% extends "base.html" %} {% load i18n %} {% block content %}
-<div class="container">
-  <h2>{% translate "محادثة مع" %} {{ other_user.username }}</h2>
-  <div class="row">
-    <div class="col-md-8 mx-auto">
-      <div class="card">
-        <div class="card-body" style="height: 400px; overflow-y: auto">
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <a href="{% url 'users:profile' other_user.username %}">
+            <img src="{{ other_user.profile.image.url }}" class="rounded-circle me-2" width="30" height="30" alt="{{ other_user.username }}">
+            {{ other_user.username }}
+          </a>
+        </h5>
+        <a href="{% url 'direct_messages:inbox' %}" class="btn btn-sm btn-outline-secondary">
+          {% translate "العودة إلى المحادثات" %}
+        </a>
+      </div>
+      <div class="card-body">
+        <div class="messages-container" style="height: 400px; overflow-y: auto;">
           {% for message in messages %}
-          <div
-            class="mb-3 {% if message.sender == request.user %}text-end{% endif %}"
-          >
-            <div
-              class="d-inline-block p-2 rounded {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}"
-            >
-              <strong>{{ message.sender.username }}</strong><br />
-              {{ message.content }}
-              <small class="d-block">{{ message.timestamp|timesince }}</small>
+          <div class="message {% if message.sender == request.user %}text-end{% endif %} mb-3">
+            <div class="d-flex {% if message.sender == request.user %}justify-content-end{% endif %}">
+              {% if message.sender != request.user %}
+              <img src="{{ message.sender.profile.image.url }}" class="rounded-circle me-2" width="30" height="30" alt="{{ message.sender.username }}">
+              {% endif %}
+              <div class="message-bubble p-3 rounded {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}" style="max-width: 70%;">
+                <p class="mb-0">{{ message.content }}</p>
+                <small class="opacity-75">{{ message.timestamp|date:"H:i" }}</small>
+              </div>
+              {% if message.sender == request.user %}
+              <img src="{{ message.sender.profile.image.url }}" class="rounded-circle ms-2" width="30" height="30" alt="{{ message.sender.username }}">
+              {% endif %}
             </div>
           </div>
           {% endfor %}
         </div>
-        <div class="card-footer">
-          <form method="post">
-            {% csrf_token %}
-            <div class="input-group">
-              <input
-                type="text"
-                name="content"
-                class="form-control"
-                placeholder="{% translate 'اكتب رسالة...' %}"
-                required
-              />
-              <button type="submit" class="btn btn-primary">
-                {% translate "إرسال" %}
-              </button>
-            </div>
-          </form>
-        </div>
+        
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+          <div class="input-group">
+            {{ form.content }}
+            <button type="submit" class="btn btn-primary">{% translate "إرسال" %}</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

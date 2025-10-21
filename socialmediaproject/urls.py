@@ -37,3 +37,10 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+# Custom error handlers
+handler404 = 'handlers.handler404'
+handler500 = 'handlers.handler500'
+handler403 = 'handlers.handler403'
+handler400 = 'handlers.handler400'

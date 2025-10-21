@@ -1,42 +1,42 @@
-{% extends "base.html" %} {% load i18n %} {% block content %}
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-sm">
-        <div class="card-header text-center">
-          <h3>{% translate "إرسال تقرير" %}</h3>
-        </div>
-        <div class="card-body">
-          <p>{% translate "الإبلاغ عن" %}: {{ object }}</p>
-          <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label for="reason" class="form-label"
-                >{% translate "سبب التقرير" %}</label
-              >
-              <select name="reason" class="form-select" required>
-                <option value="spam">سبام</option>
-                <option value="harassment">تحرش</option>
-                <option value="inappropriate">محتوى غير مناسب</option>
-                <option value="other">أخرى</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label"
-                >{% translate "وصف التقرير" %}</label
-              >
-              <textarea
-                name="description"
-                class="form-control"
-                rows="3"
-                required
-              ></textarea>
-            </div>
-            <button type="submit" class="btn btn-danger w-100">
-              {% translate "إرسال التقرير" %}
-            </button>
-          </form>
-        </div>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          {% if type == 'post' %}
+            {% translate "الإبلاغ عن منشور" %}
+          {% elif type == 'user' %}
+            {% translate "الإبلاغ عن مستخدم" %}
+          {% endif %}
+        </h3>
+      </div>
+      <div class="card-body">
+        <p>
+          {% if type == 'post' %}
+            {% translate "جاري الإبلاغ عن:" %} "{{ object.content|truncatechars:50 }}"
+          {% elif type == 'user' %}
+            {% translate "جاري الإبلاغ عن المستخدم:" %} {{ object.username }}
+          {% endif %}
+        </p>
+        
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="{{ form.reason.id_for_label }}" class="form-label">{% translate "السبب" %}</label>
+            {{ form.reason }}
+          </div>
+          
+          <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">{% translate "التفاصيل" %}</label>
+            {{ form.description }}
+          </div>
+          
+          <button type="submit" class="btn btn-danger w-100">{% translate "إرسال التقرير" %}</button>
+        </form>
       </div>
     </div>
   </div>

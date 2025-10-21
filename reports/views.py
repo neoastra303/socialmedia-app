@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
 from .models import Report
+from .forms import ReportForm
 from django.contrib.auth.models import User
 from posts.models import Post, Comment
 
@@ -10,33 +11,33 @@ from posts.models import Post, Comment
 def report_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
-        reason = request.POST.get('reason')
-        description = request.POST.get('description')
-        Report.objects.create(
-            reporter=request.user,
-            reported_post=post,
-            reason=reason,
-            description=description
-        )
-        messages.success(request, 'تم إرسال التقرير بنجاح.')
-        return redirect('posts:post_detail', post_id=post.id)
-    return render(request, 'reports/report_form.html', {'object': post, 'type': 'post'})
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.reporter = request.user
+            report.reported_post = post
+            report.save()
+            messages.success(request, 'تم إرسال التقرير بنجاح.')
+            return redirect('posts:post_detail', post_id=post.id)
+    else:
+        form = ReportForm()
+    return render(request, 'reports/report_form.html', {'object': post, 'type': 'post', 'form': form})
 
 @login_required
 def report_user(request, username):
     user = get_object_or_404(User, username=username)
     if request.method == 'POST':
-        reason = request.POST.get('reason')
-        description = request.POST.get('description')
-        Report.objects.create(
-            reporter=request.user,
-            reported_user=user,
-            reason=reason,
-            description=description
-        )
-        messages.success(request, 'تم إرسال التقرير بنجاح.')
-        return redirect('users:profile', username=username)
-    return render(request, 'reports/report_form.html', {'object': user, 'type': 'user'})
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.reporter = request.user
+            report.reported_user = user
+            report.save()
+            messages.success(request, 'تم إرسال التقرير بنجاح.')
+            return redirect('users:profile', username=username)
+    else:
+        form = ReportForm()
+    return render(request, 'reports/report_form.html', {'object': user, 'type': 'user', 'form': form})
 
 @user_passes_test(lambda u: u.is_staff)
 def admin_reports(request):
