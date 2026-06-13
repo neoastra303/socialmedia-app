@@ -15,4 +15,7 @@ urlpatterns = [
     path('profile/<str:username>/unfollow/', views.unfollow_user, name='unfollow_user'),
     path('profile/<str:username>/followers/', views.followers_list, name='followers_list'),
     path('profile/<str:username>/following/', views.following_list, name='following_list'),
+    path('profile/<str:username>/block/', views.block_user, name='block_user'),
+    path('profile/<str:username>/unblock/', views.unblock_user, name='unblock_user'),
+    path('blocked/', views.blocked_users_list, name='blocked_users_list'),
 ]

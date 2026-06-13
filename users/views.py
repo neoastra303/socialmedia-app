@@ -197,6 +197,36 @@ def unfollow_user(request, username):
     return redirect('users:profile', username=username)
 
 @login_required
+def block_user(request, username):
+    try:
+        user_to_block = get_object_or_404(User, username=username)
+        if request.user == user_to_block:
+            messages.warning(request, _('لا يمكنك حظر نفسك'))
+            return redirect('users:profile', username=username)
+        if request.user.profile.block(user_to_block):
+            messages.success(request, _(f'تم حظر {username}'))
+    except Exception as e:
+        logger.error(f"Error blocking user: {str(e)}")
+        messages.error(request, _('حدث خطأ أثناء محاولة الحظر.'))
+    return redirect('users:profile', username=username)
+
+@login_required
+def unblock_user(request, username):
+    try:
+        user_to_unblock = get_object_or_404(User, username=username)
+        if request.user.profile.unblock(user_to_unblock):
+            messages.success(request, _(f'تم إلغاء حظر {username}'))
+    except Exception as e:
+        logger.error(f"Error unblocking user: {str(e)}")
+        messages.error(request, _('حدث خطأ أثناء محاولة إلغاء الحظر.'))
+    return redirect('users:profile', username=username)
+
+@login_required
+def blocked_users_list(request):
+    blocked = request.user.profile.blocked_users.all()
+    return render(request, 'users/blocked_users.html', {'blocked': blocked})
+
+@login_required
 def followers_list(request, username):
     user = get_object_or_404(User, username=username)
     followers = user.profile.followers.all()
