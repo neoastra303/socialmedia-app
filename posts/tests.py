@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from .models import Post, Reaction, Hashtag, Story
-from .forms import PostForm
-from .utils import validate_image_file, validate_video_file
+from .models import Post, Reaction, Hashtag, Story, Bookmark
+from .forms import PostForm, CommentForm
+from .utils import validate_image_file, validate_video_file, contains_profanity
 from django.core.files.base import ContentFile
 import tempfile
 from io import BytesIO
@@ -307,3 +307,67 @@ class PostViewTestCase(TestCase):
         
         self.assertEqual(response.status_code, 200)  # Should return to form with errors
         self.assertContains(response, 'A post cannot have both an image and a video.')
+
+
+class ProfanityFilterTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+
+    def test_contains_profanity_true(self):
+        self.assertTrue(contains_profanity('this is shit content'))
+        self.assertTrue(contains_profanity('what the fuck'))
+        self.assertTrue(contains_profanity('you bitch'))
+
+    def test_contains_profanity_false(self):
+        self.assertFalse(contains_profanity('this is clean content'))
+        self.assertFalse(contains_profanity('hello world'))
+        self.assertFalse(contains_profanity(''))
+
+    def test_post_form_rejects_profanity(self):
+        form = PostForm(data={'content': 'this is shit content'})
+        self.assertFalse(form.is_valid())
+
+    def test_comment_form_rejects_profanity(self):
+        form = CommentForm(data={'content': 'you are a bitch'})
+        self.assertFalse(form.is_valid())
+
+    def test_post_model_rejects_profanity(self):
+        post = Post(author=self.user, content='fuck this')
+        with self.assertRaises(ValidationError):
+            post.full_clean()
+
+
+class BookmarkTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpass123')
+        self.client = Client()
+        self.client.login(username='testuser', password='testpass123')
+        self.post = Post.objects.create(author=self.user, content='Test post')
+
+    def test_bookmark_creation(self):
+        bookmark = Bookmark.objects.create(user=self.user, post=self.post)
+        self.assertEqual(bookmark.user, self.user)
+        self.assertEqual(bookmark.post, self.post)
+        self.assertEqual(self.user.bookmarks.count(), 1)
+
+    def test_bookmark_unique_together(self):
+        Bookmark.objects.create(user=self.user, post=self.post)
+        with self.assertRaises(Exception):
+            Bookmark.objects.create(user=self.user, post=self.post)
+
+    def test_bookmark_toggle_add(self):
+        response = self.client.post(reverse('posts:bookmark_toggle', args=[self.post.id]), secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Bookmark.objects.filter(user=self.user, post=self.post).exists())
+
+    def test_bookmark_toggle_remove(self):
+        Bookmark.objects.create(user=self.user, post=self.post)
+        response = self.client.post(reverse('posts:bookmark_toggle', args=[self.post.id]), secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Bookmark.objects.filter(user=self.user, post=self.post).exists())
+
+    def test_saved_posts_view(self):
+        Bookmark.objects.create(user=self.user, post=self.post)
+        response = self.client.get(reverse('posts:saved_posts'), secure=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test post')

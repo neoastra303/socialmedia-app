@@ -31,7 +31,7 @@
           {% translate "تعديل الملف الشخصي" %}
         </a>
         {% else %}
-        {% if request.user.profile.is_blocked user %}
+        {% if is_blocked %}
         <a href="{% url 'users:unblock_user' user.username %}" class="btn btn-outline-success btn-sm">
           {% translate "إلغاء الحظر" %}
         </a>

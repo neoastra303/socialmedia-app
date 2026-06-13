@@ -104,11 +104,13 @@ def profile(request, username=None):
             p_form = ProfileUpdateForm(instance=user.profile) if user == request.user else None
 
         posts = Post.objects.select_related('author').filter(author=user).order_by('-created_at')
+        is_blocked = request.user.profile.is_blocked(user) if request.user != user else False
         context = {
             'user': user,
             'posts': posts,
             'u_form': u_form,
-            'p_form': p_form
+            'p_form': p_form,
+            'is_blocked': is_blocked,
         }
         return render(request, 'users/profile.html', context)
     except Exception as e:
