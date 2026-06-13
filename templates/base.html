@@ -81,14 +81,26 @@
             </li>
             <li class="nav-item">
               <a
+                class="nav-link"
+                href="{% url 'posts:trending_hashtags' %}"
+                aria-label="Trending"
+              >
+                <i class="fas fa-fire me-1"></i>
+                {% translate "الرائج" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
                 class="nav-link position-relative"
                 href="{% url 'notifications:notification_list' %}"
                 aria-label="Notifications"
               >
                 <i class="fas fa-bell me-1"></i>
-                {% translate "الإشعارات" %}
-                {% if unread_notifications_count > 0 %}
-                <span class="notifications-badge">{{ unread_notifications_count }}</span>
+                {% translate "الإشعارات" %} {% if unread_notifications_count > 0
+                %}
+                <span class="notifications-badge"
+                  >{{ unread_notifications_count }}</span
+                >
                 {% endif %}
               </a>
             </li>

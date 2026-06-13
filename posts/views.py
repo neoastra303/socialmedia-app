@@ -214,6 +214,12 @@ def hashtag_posts(request, hashtag_name):
     return render(request, 'posts/hashtag_posts.html', {'hashtag': hashtag, 'page_obj': page_obj})
 
 @login_required
+def trending_hashtags(request):
+    from django.db.models import Count
+    hashtags = Hashtag.objects.annotate(post_count=Count('posts')).order_by('-post_count')[:10]
+    return render(request, 'posts/trending_hashtags.html', {'hashtags': hashtags})
+
+@login_required
 def search(request):
     """البحث المتقدم في المنشورات والمستخدمين"""
     try:
