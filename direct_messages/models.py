@@ -16,12 +16,13 @@ class Conversation(models.Model):
 
     @classmethod
     def get_or_create_for_users(cls, user1, user2):
-        # Get existing conversation or create new one
         conversation = cls.objects.filter(participants=user1).filter(participants=user2).first()
+        created = False
         if not conversation:
             conversation = cls.objects.create()
             conversation.participants.add(user1, user2)
-        return conversation, not conversation.pk  # Return (conversation, created)
+            created = True
+        return conversation, created
 
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')

@@ -61,7 +61,7 @@ extend-ignore = [
 ]
 
 # Target Python version.
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.mccabe]
 # Unlike Flake8, default to a complexity level of 10.

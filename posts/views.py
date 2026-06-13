@@ -15,17 +15,15 @@ from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import PostSerializer
+from django.utils import timezone
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
-
 @login_required
 def post_list(request):
-    """عرض قائمة المنشورات"""
-    posts = Post.objects.all().order_by('-created_at')
-    paginator = Paginator(posts, 10)  # Show 10 posts per page
+    posts = Post.objects.select_related('author').all().order_by('-created_at')
+    paginator = Paginator(posts, 10)
     
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -35,8 +33,8 @@ def post_list(request):
 @login_required
 def post_detail(request, post_id):
     """عرض تفاصيل منشور معين"""
-    post = get_object_or_404(Post, id=post_id)
-    comments = post.comments.all().order_by('-created_at')
+    post = get_object_or_404(Post.objects.select_related('author'), id=post_id)
+    comments = post.comments.select_related('author').all().order_by('-created_at')
     
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
@@ -104,15 +102,14 @@ def post_create(request):
     return render(request, 'posts/post_create.html', {'form': form})
 
 @login_required
+@ratelimit(key='user', rate='5/m', method='POST', block=True)
 def post_edit(request, post_id):
-    """تعديل منشور"""
-    post = get_object_or_404(Post, id=post_id)
-    
-    # Check if user is the author
+    post = get_object_or_404(Post.objects.select_related('author'), id=post_id)
+
     if post.author != request.user:
         messages.error(request, _('لا يمكنك تعديل منشور شخص آخر.'))
         return redirect('posts:post_detail', post_id=post.id)
-    
+
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
@@ -126,7 +123,6 @@ def post_edit(request, post_id):
                 logger.error(f"Error updating post: {str(e)}")
                 messages.error(request, _('حدث خطأ أثناء تحديث المنشور.'))
         else:
-            # Handle form errors
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
@@ -135,8 +131,8 @@ def post_edit(request, post_id):
     return render(request, 'posts/post_edit.html', {'form': form, 'post': post})
 
 @login_required
+@ratelimit(key='user', rate='5/m', method='POST', block=True)
 def post_delete(request, post_id):
-    """حذف منشور"""
     post = get_object_or_404(Post, id=post_id, author=request.user)
     if request.method == 'POST':
         post.delete()
@@ -146,12 +142,10 @@ def post_delete(request, post_id):
 
 @login_required
 def react_to_post(request, post_id):
-    """إضافة/تغيير/إزالة تفاعل على المنشور"""
     try:
-        post = get_object_or_404(Post, id=post_id)
+        post = get_object_or_404(Post.objects.select_related('author'), id=post_id)
         reaction_type = request.POST.get('reaction', 'like')
-        
-        # Validate reaction type
+
         valid_reactions = [choice[0] for choice in Reaction.REACTION_CHOICES]
         if reaction_type not in valid_reactions:
             return JsonResponse({
@@ -167,16 +161,13 @@ def react_to_post(request, post_id):
 
         if not created:
             if reaction.reaction_type == reaction_type:
-                # Same reaction, remove it
                 reaction.delete()
                 reacted = False
                 reaction_type = None
             else:
-                # Different reaction, update it
                 reaction.reaction_type = reaction_type
                 reaction.save()
                 reacted = True
-                # Send notification if changing reaction
                 if request.user != post.author:
                     send_notification(
                         post.author,
@@ -187,7 +178,6 @@ def react_to_post(request, post_id):
                     )
         else:
             reacted = True
-            # Send notification for new reaction
             if request.user != post.author:
                 send_notification(
                     post.author,
@@ -214,7 +204,7 @@ def react_to_post(request, post_id):
 def hashtag_posts(request, hashtag_name):
     """عرض المنشورات حسب الهاشتاج"""
     hashtag = get_object_or_404(Hashtag, name=hashtag_name)
-    posts = hashtag.posts.all().order_by('-created_at')
+    posts = hashtag.posts.select_related('author').all().order_by('-created_at')
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -243,9 +233,9 @@ def search(request):
             if filter_type in ['all', 'posts']:
                 # Search in posts content and hashtags
                 posts = Post.objects.filter(
-                    models.Q(content__icontains=query) |
-                    models.Q(hashtags__name__icontains=query)
-                ).distinct().order_by('-created_at')
+                    Q(content__icontains=query) |
+                    Q(hashtags__name__icontains=query)
+                ).select_related('author').distinct().order_by('-created_at')
                 paginator = Paginator(posts, 10)
                 page_number = request.GET.get('page')
                 results['posts'] = paginator.get_page(page_number)
@@ -253,8 +243,8 @@ def search(request):
             if filter_type in ['all', 'users']:
                 # Search in users
                 users = User.objects.filter(
-                    models.Q(username__icontains=query) |
-                    models.Q(profile__bio__icontains=query)
+                    Q(username__icontains=query) |
+                    Q(profile__bio__icontains=query)
                 ).distinct()
                 results['users'] = users
 
@@ -272,7 +262,7 @@ def search(request):
 @login_required
 def stories_list(request):
     """عرض القصص النشطة"""
-    stories = Story.objects.filter(expires_at__gt=timezone.now()).order_by('-created_at')
+    stories = Story.objects.select_related('author').filter(expires_at__gt=timezone.now()).order_by('-created_at')
     return render(request, 'posts/stories_list.html', {'stories': stories})
 
 @login_required
@@ -315,13 +305,13 @@ def create_story(request):
 @login_required
 def view_story(request, story_id):
     """عرض قصة معينة"""
-    story = get_object_or_404(Story, id=story_id)
+    story = get_object_or_404(Story.objects.select_related('author'), id=story_id)
     if not story.is_expired():
         story.views.add(request.user)
     return render(request, 'posts/view_story.html', {'story': story})
 
 @api_view(['GET'])
 def api_post_list(request):
-    posts = Post.objects.all().order_by('-created_at')
+    posts = Post.objects.select_related('author').all().order_by('-created_at')
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)

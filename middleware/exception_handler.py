@@ -8,6 +8,13 @@ from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 
+
+def is_ajax_request(req):
+    return req.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or \
+           'application/json' in req.META.get('HTTP_ACCEPT', '') or \
+           req.content_type == 'application/json'
+
+
 class GlobalExceptionHandlerMiddleware:
     """
     Global exception handling middleware that catches common errors and 
@@ -37,12 +44,6 @@ class GlobalExceptionHandlerMiddleware:
             },
             exc_info=True
         )
-        
-        # Helper function to check if request is AJAX
-        def is_ajax_request(req):
-            return req.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or \
-                   'application/json' in req.META.get('HTTP_ACCEPT', '') or \
-                   req.content_type == 'application/json'
         
         # Handle different types of exceptions
         if isinstance(exception, Http404):
@@ -98,12 +99,6 @@ class ValidationMiddleware:
         if request.method in ['POST', 'PUT', 'PATCH'] and request.FILES:
             total_size = sum(file.size for file in request.FILES.values())
             if total_size > self.max_upload_size:
-                # Helper function to check if request is AJAX (same as in GlobalExceptionHandlerMiddleware)
-                def is_ajax_request(req):
-                    return req.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or \
-                           'application/json' in req.META.get('HTTP_ACCEPT', '') or \
-                           req.content_type == 'application/json'
-                
                 if is_ajax_request(request) or 'application/json' in request.META.get('HTTP_ACCEPT', ''):
                     return JsonResponse({
                         'error': 'File too large',

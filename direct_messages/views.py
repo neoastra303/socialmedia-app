@@ -10,7 +10,7 @@ from notifications.utils import send_notification
 
 @login_required
 def inbox(request):
-    conversations = request.user.conversations.all()
+    conversations = request.user.conversations.prefetch_related('participants').all()
     return render(request, 'messages/inbox.html', {'conversations': conversations})
 
 @login_required
@@ -36,7 +36,7 @@ def conversation_detail(request, username):
     else:
         form = MessageForm()
 
-    messages_list = conversation.messages.all()
+    messages_list = conversation.messages.select_related('sender').all()
     return render(request, 'messages/conversation.html', {
         'conversation': conversation,
         'messages': messages_list,
@@ -69,4 +69,4 @@ def send_message(request):
 
         return JsonResponse({'status': 'success', 'message_id': message.id})
 
-    return JsonResponse({'status': 'error'})
+    return JsonResponse({'status': 'error'}, status=400)

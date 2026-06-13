@@ -86,11 +86,10 @@
                 aria-label="Notifications"
               >
                 <i class="fas fa-bell me-1"></i>
-                {% translate "الإشعارات" %} {% with
-                unread_count=user.notifications.filter|length %} {% if
-                unread_count > 0 %}
-                <span class="notifications-badge">{{ unread_count }}</span>
-                {% endif %} {% endwith %}
+                {% translate "الإشعارات" %}
+                {% if unread_notifications_count > 0 %}
+                <span class="notifications-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
               </a>
             </li>
             <li class="nav-item">

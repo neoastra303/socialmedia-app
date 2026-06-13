@@ -1,13 +1,15 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from .models import Notification
-
-# Create your views here.
 
 @login_required
 def notification_list(request):
-    notifications = request.user.notifications.all()
+    notifications_list = request.user.notifications.all()
+    paginator = Paginator(notifications_list, 20)
+    page_number = request.GET.get('page')
+    notifications = paginator.get_page(page_number)
     return render(request, 'notifications/notification_list.html', {'notifications': notifications})
 
 @login_required

@@ -16,7 +16,7 @@ def search(request):
             posts = Post.objects.filter(
                 Q(content__icontains=query) |
                 Q(author__username__icontains=query)
-            ).order_by('-created_at')
+            ).select_related('author').order_by('-created_at')
         else:
             posts = Post.objects.none()
             
@@ -60,7 +60,7 @@ def advanced_search(request):
     author = request.GET.get('author')
     has_image = request.GET.get('has_image')
     
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('author').all()
     
     if query:
         posts = posts.filter(content__icontains=query)
@@ -75,7 +75,7 @@ def advanced_search(request):
         posts = posts.filter(author__username__icontains=author)
     
     if has_image:
-        posts = posts.exclude(image='')
+        posts = posts.exclude(image__isnull=True).exclude(image__exact='')
     
     posts = posts.order_by('-created_at')
     

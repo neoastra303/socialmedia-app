@@ -19,6 +19,14 @@ def process_profile_image(profile_id):
                 img = Image.open(profile.image.path)
                 webp_path = profile.image.path.rsplit('.', 1)[0] + '.webp'
                 img.save(webp_path, 'WEBP', quality=80)
+                # Update profile image field to point to WebP file
+                from django.core.files import File
+                with open(webp_path, 'rb') as f:
+                    profile.image.save(
+                        os.path.basename(webp_path),
+                        File(f),
+                        save=True
+                    )
             except Exception:
                 pass  # Fallback if WebP not supported
     except Profile.DoesNotExist:

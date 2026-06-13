@@ -1,9 +1,11 @@
 from datetime import datetime
 
 def global_context(request):
-    """
-    إضافة متغيرات عامة متاحة لجميع القوالب
-    """
+    if request.user.is_authenticated:
+        unread_count = request.user.notifications.filter(is_read=False).count()
+    else:
+        unread_count = 0
     return {
-        'current_year': datetime.now().year
-    } 
+        'current_year': datetime.now().year,
+        'unread_notifications_count': unread_count,
+    }

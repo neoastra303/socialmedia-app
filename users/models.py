@@ -57,20 +57,28 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
+        image_changed = False
+        if self.pk and self.image:
+            try:
+                original = Profile.objects.get(pk=self.pk).image
+                image_changed = (original != self.image)
+            except Profile.DoesNotExist:
+                image_changed = bool(self.image)
+        else:
+            image_changed = bool(self.image)
         super().save(*args, **kwargs)
-        # Schedule background task for image processing
-        if self.image:
+        if image_changed:
             from .tasks import process_profile_image
             process_profile_image(self.id, schedule=0)
 
     def follow(self, user):
-        if user != self.user:
-            # Prevent users from following themselves
-            if user == self.user:
-                return False
+        if user == self.user:
+            return False
+        try:
             self.following.add(user.profile)
             return True
-        return False
+        except Profile.DoesNotExist:
+            return False
 
     def unfollow(self, user):
         self.following.remove(user.profile)

@@ -49,6 +49,10 @@ def resolve_report(request, report_id):
     report = get_object_or_404(Report, id=report_id)
     if request.method == 'POST':
         action = request.POST.get('action')
+        valid_actions = ['pending', 'resolved', 'dismissed']
+        if action not in valid_actions:
+            messages.error(request, 'إجراء غير صالح.')
+            return redirect('reports:admin_reports')
         report.status = action
         report.resolved_at = timezone.now()
         report.resolved_by = request.user

@@ -94,16 +94,15 @@ def profile(request, username=None):
                     logger.error(f"Error updating profile: {str(e)}")
                     messages.error(request, _('حدث خطأ أثناء تحديث الملف الشخصي.'))
             else:
-                # Handle form errors
                 for form_name, form in [('User', u_form), ('Profile', p_form)]:
                     for field, errors in form.errors.items():
                         for error in errors:
                             messages.error(request, f"{form_name} - {field}: {error}")
         else:
-            u_form = UserUpdateForm(instance=user)
-            p_form = ProfileUpdateForm(instance=user.profile)
+            u_form = UserUpdateForm(instance=user) if user == request.user else None
+            p_form = ProfileUpdateForm(instance=user.profile) if user == request.user else None
 
-        posts = Post.objects.filter(author=user).order_by('-created_at')
+        posts = Post.objects.select_related('author').filter(author=user).order_by('-created_at')
         context = {
             'user': user,
             'posts': posts,
@@ -158,8 +157,7 @@ def follow_user(request, username):
             messages.warning(request, _('لا يمكنك متابعة نفسك'))
             return redirect('users:profile', username=username)
         
-        # Check if already following
-        if user_to_follow in request.user.profile.following.all():
+        if request.user.profile.following.filter(pk=user_to_follow.pk).exists():
             messages.warning(request, _(f'أنت تتابع {username} بالفعل'))
             return redirect('users:profile', username=username)
         
@@ -189,8 +187,7 @@ def unfollow_user(request, username):
             messages.warning(request, _('لا يمكنك إلغاء متابعة نفسك'))
             return redirect('users:profile', username=username)
         
-        # Check if following
-        if user_to_unfollow not in request.user.profile.following.all():
+        if not request.user.profile.following.filter(pk=user_to_unfollow.pk).exists():
             messages.warning(request, _(f'أنت لا تتابع {username}'))
             return redirect('users:profile', username=username)
         

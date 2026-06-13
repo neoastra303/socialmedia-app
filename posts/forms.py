@@ -2,7 +2,6 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import Post, Comment
 from django.core.exceptions import ValidationError
-from .utils import validate_image_file, validate_video_file
 
 
 class PostForm(forms.ModelForm):

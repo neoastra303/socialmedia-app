@@ -8,6 +8,14 @@ from .forms import PostForm
 from .utils import validate_image_file, validate_video_file
 from django.core.files.base import ContentFile
 import tempfile
+from io import BytesIO
+from PIL import Image
+
+
+def _valid_jpeg_bytes():
+    buf = BytesIO()
+    Image.new('RGB', (1, 1), color='red').save(buf, 'JPEG')
+    return buf.getvalue()
 
 class PostTestCase(TestCase):
     def setUp(self):
@@ -40,7 +48,7 @@ class PostFileValidationTestCase(TestCase):
         """Test that valid image files pass validation"""
         image = SimpleUploadedFile(
             name='test_image.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         # Should not raise validation error
@@ -86,9 +94,15 @@ class PostFileValidationTestCase(TestCase):
 
     def test_large_image_file(self):
         """Test that large image files fail validation"""
+        buf = BytesIO()
+        img = Image.new('RGB', (1000, 1000), color='red')
+        img.save(buf, 'JPEG', quality=95)
+        # Ensure it's over 5MB (Profile's limit)
+        while buf.tell() < 6 * 1024 * 1024:
+            buf.write(b'\x00')
         large_image = SimpleUploadedFile(
             name='large_image.jpg',
-            content=b'x' * (2 * 1024 * 1024),  # 2MB file
+            content=buf.getvalue(),
             content_type='image/jpeg'
         )
         
@@ -115,7 +129,7 @@ class PostFormValidationTestCase(TestCase):
         """Test that post form accepts valid image uploads"""
         image = SimpleUploadedFile(
             name='test.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         
@@ -143,7 +157,7 @@ class PostFormValidationTestCase(TestCase):
         """Test that post form rejects having both image and video"""
         image = SimpleUploadedFile(
             name='test.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         video = SimpleUploadedFile(
@@ -196,7 +210,7 @@ class PostModelValidationTestCase(TestCase):
         """Test that post model rejects both image and video"""
         image = SimpleUploadedFile(
             name='test.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         video = SimpleUploadedFile(
@@ -244,14 +258,14 @@ class PostViewTestCase(TestCase):
         """Test creating a post with an image"""
         image = SimpleUploadedFile(
             name='test.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         
         response = self.client.post(reverse('posts:post_create'), {
             'content': 'Test post with image',
             'image': image
-        })
+        }, secure=True)
         
         self.assertEqual(response.status_code, 302)  # Redirect after successful creation
         self.assertTrue(Post.objects.filter(content='Test post with image').exists())
@@ -267,7 +281,7 @@ class PostViewTestCase(TestCase):
         response = self.client.post(reverse('posts:post_create'), {
             'content': 'Test post with video',
             'video': video
-        })
+        }, secure=True)
         
         self.assertEqual(response.status_code, 302)  # Redirect after successful creation
         self.assertTrue(Post.objects.filter(content='Test post with video').exists())
@@ -276,7 +290,7 @@ class PostViewTestCase(TestCase):
         """Test that creating a post with both image and video fails"""
         image = SimpleUploadedFile(
             name='test.jpg',
-            content=b'test image content',
+            content=_valid_jpeg_bytes(),
             content_type='image/jpeg'
         )
         video = SimpleUploadedFile(
@@ -289,7 +303,7 @@ class PostViewTestCase(TestCase):
             'content': 'Test post with both',
             'image': image,
             'video': video
-        })
+        }, secure=True)
         
         self.assertEqual(response.status_code, 200)  # Should return to form with errors
         self.assertContains(response, 'A post cannot have both an image and a video.')

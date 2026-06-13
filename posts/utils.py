@@ -14,8 +14,7 @@ def validate_file_extension(file):
         'video': ['.mp4', '.mov', '.avi', '.mkv', '.webm']
     }
     
-    # Get file extension
-    _, ext = os.path.splitext(file.name)
+    __, ext = os.path.splitext(file.name)
     ext = ext.lower()
     
     # Check if extension is valid
@@ -49,9 +48,8 @@ def validate_image_file(file, max_size_mb=10):
     """
     validate_file_extension(file)
     
-    # Verify it's an image extension
     valid_image_extensions = ['.jpg', '.jpeg', '.png', '.gif']
-    _, ext = os.path.splitext(file.name)
+    __, ext = os.path.splitext(file.name)
     ext = ext.lower()
     
     if ext not in valid_image_extensions:
@@ -70,9 +68,8 @@ def validate_video_file(file, max_size_mb=100):
     """
     validate_file_extension(file)
     
-    # Verify it's a video extension
     valid_video_extensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm']
-    _, ext = os.path.splitext(file.name)
+    __, ext = os.path.splitext(file.name)
     ext = ext.lower()
     
     if ext not in valid_video_extensions:
@@ -89,7 +86,7 @@ def get_file_type(file):
     """
     Determine if a file is an image or video based on extension
     """
-    _, ext = os.path.splitext(file.name)
+    __, ext = os.path.splitext(file.name)
     ext = ext.lower()
     
     image_extensions = ['.jpg', '.jpeg', '.png', '.gif']

@@ -99,6 +99,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'socialmediaproject.context_processors.global_context',
             ],
         },
     },
@@ -173,13 +174,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files for production vs development
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
 if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
-    # Static files storage for production
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-else:
-    # In development, don't set STATIC_ROOT so Django serves files automatically
-    pass
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -204,18 +201,35 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Cache configuration
+# Silence rate limiting cache warnings for non-Redis backends (development only)
+SILENCED_SYSTEM_CHECKS = [
+    'django_ratelimit.E003',
+    'django_ratelimit.W001',
+]
+
 # Cache configuration
 # For production, use Redis for better performance.
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
     }
 }
+
+REDIS_URL = os.environ.get('REDIS_URL')
+if REDIS_URL:
+    try:
+        import redis
+        redis.from_url(REDIS_URL).ping()
+        CACHES['default'] = {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    except Exception:
+        pass
 
 # Rate Limiting Configuration
 RATELIMIT_CACHE_PREFIX = 'rl:'
@@ -224,16 +238,25 @@ RATELIMIT_USE_CACHE = 'default'  # Use the default cache
 RATELIMIT_VIEW = 'middleware.rate_limiting.custom_ratelimit'  # Custom rate limit view
 
 # Channels
-# Channels
 # For production, use Redis for the channel layer.
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/2')],
-        },
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
+
+if os.environ.get('REDIS_URL'):
+    try:
+        import redis
+        redis.from_url(os.environ.get('REDIS_URL')).ping()
+        CHANNEL_LAYERS['default'] = {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [os.environ.get('REDIS_URL')],
+            },
+        }
+    except Exception:
+        pass
 
 # Messages settings
 from django.contrib.messages import constants as messages
@@ -248,7 +271,6 @@ MESSAGE_TAGS = {
 # Security Settings
 if not DEBUG:
     # Security settings for production
-    SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_SECONDS = 31536000  # 1 year

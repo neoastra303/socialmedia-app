@@ -30,25 +30,29 @@ def custom_ratelimit(key=None, rate='5/m', method='POST', block=False):
             if was_limited:
                 if block:
                     # Return JSON response for API calls or regular response for web requests
-                    if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or \
+                    ip = request.META.get('REMOTE_ADDR', 'unknown')
+                    user = getattr(request, 'user', None)
+                    identifier = str(user) if user and user.is_authenticated else ip
+                    if hasattr(request, 'META') and request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' or \
                        request.content_type == 'application/json' or \
                        'application/json' in request.META.get('HTTP_ACCEPT', ''):
-                        logger.warning(f"Rate limit exceeded for {key}: {getattr(request, key, 'unknown') if key else 'unknown'}")
+                        logger.warning(f"Rate limit exceeded for {key}: {identifier}")
                         return JsonResponse({
                             'error': 'Rate limit exceeded',
                             'message': f'You have exceeded the rate limit of {rate}. Please try again later.',
-                            'retry_after': '60'  # Suggest to retry after 60 seconds
-                        }, status=429)  # 429 is the standard rate limiting status code
+                            'retry_after': '60'
+                        }, status=429)
                     else:
-                        # For non-ajax requests, render an error page
-                        logger.warning(f"Rate limit exceeded for {key}: {getattr(request, key, 'unknown') if key else 'unknown'}")
+                        logger.warning(f"Rate limit exceeded for {key}: {identifier}")
                         return render(request, 'errors/rate_limit.html', {
                             'rate_limit': rate,
                             'retry_after': '60 seconds'
                         }, status=429)
                 else:
-                    # Just log the rate limit but don't block
-                    logger.info(f"Rate limit hit (not blocking) for {key}: {getattr(request, key, 'unknown') if key else 'unknown'}")
+                    ip = request.META.get('REMOTE_ADDR', 'unknown')
+                    user = getattr(request, 'user', None)
+                    identifier = str(user) if user and user.is_authenticated else ip
+                    logger.info(f"Rate limit hit (not blocking) for {key}: {identifier}")
             
             # Call the original view function
             return view_func(request, *args, **kwargs)
