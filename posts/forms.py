@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import Post, Comment
 from django.core.exceptions import ValidationError
+from .utils import contains_profanity
 
 
 class PostForm(forms.ModelForm):
@@ -29,6 +30,8 @@ class PostForm(forms.ModelForm):
         content = self.cleaned_data.get('content')
         if content and len(content.strip()) == 0:
             raise ValidationError(_('Post content cannot be empty or just whitespace.'))
+        if content and contains_profanity(content):
+            raise ValidationError(_('Post content contains inappropriate language.'))
         return content
     
     def clean_image(self):
@@ -95,4 +98,6 @@ class CommentForm(forms.ModelForm):
         content = self.cleaned_data.get('content')
         if content and len(content.strip()) == 0:
             raise ValidationError(_('Comment content cannot be empty or just whitespace.'))
+        if content and contains_profanity(content):
+            raise ValidationError(_('Comment content contains inappropriate language.'))
         return content 

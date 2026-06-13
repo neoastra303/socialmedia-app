@@ -98,3 +98,33 @@ def get_file_type(file):
         return 'video'
     else:
         return 'unknown'
+
+import re
+
+PROFANITY_WORDS = {
+    'fuck', 'shit', 'ass', 'bitch', 'damn', 'crap', 'dick', 'bastard',
+    'piss', 'slut', 'whore', 'cock', 'cunt', 'douche', 'fag', 'nigger',
+    'nigga', 'porn', 'sex', 'xxx',
+}
+
+PROFANITY_PATTERNS = [
+    re.compile(r'\b' + re.escape(word) + r'\b', re.IGNORECASE)
+    for word in PROFANITY_WORDS
+]
+
+def contains_profanity(text):
+    if not text:
+        return False
+    for pattern in PROFANITY_PATTERNS:
+        if pattern.search(text):
+            return True
+    return False
+
+def censor_profanity(text, replacement='***'):
+    if not text:
+        return text
+    result = text
+    for word in PROFANITY_WORDS:
+        pattern = re.compile(r'\b' + re.escape(word) + r'\b', re.IGNORECASE)
+        result = pattern.sub(replacement, result)
+    return result

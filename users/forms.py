@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
 from .models import Profile
 from django.core.exceptions import ValidationError
+from posts.utils import contains_profanity
 
 
 class UserRegisterForm(UserCreationForm):
@@ -129,4 +130,6 @@ class ProfileUpdateForm(forms.ModelForm):
         bio = self.cleaned_data.get('bio')
         if bio and len(bio) > 500:
             raise ValidationError(_('Bio cannot exceed 500 characters.'))
+        if bio and contains_profanity(bio):
+            raise ValidationError(_('Bio contains inappropriate language.'))
         return bio 
