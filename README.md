@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/i18n-Arabic%20%7C%20English-blue?style=flat-square" alt="i18n"/>
 </div>
 
-<h1 align="center">🚀 منصتي — Social Media Platform</h1>
+<h1 align="center">🚀— Social Media Platform</h1>
 
 <p align="center">
   <b>A production-ready social media application built with Django 5.1</b><br/>
