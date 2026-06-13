@@ -183,6 +183,11 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Authentication settings
+AUTHENTICATION_BACKENDS = [
+    'users.backends.email_auth.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 LOGIN_REDIRECT_URL = 'posts:post_list'
 LOGIN_URL = 'users:login'
 LOGOUT_REDIRECT_URL = 'users:login'
