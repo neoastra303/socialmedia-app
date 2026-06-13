@@ -180,6 +180,16 @@
             <li class="nav-item">
               <a
                 class="nav-link"
+                href="{% url 'users:settings' %}"
+                aria-label="Settings"
+              >
+                <i class="fas fa-cog me-1"></i>
+                {% translate "الإعدادات" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
                 href="{% url 'users:logout' %}"
                 aria-label="Logout"
               >
@@ -279,13 +289,11 @@
       notificationSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
         if (data.type === "notification") {
-          // Show notification (you can enhance this with a toast or modal)
           showNotification(data.notification.message);
         }
       };
 
       function showNotification(message) {
-        // Simple alert for now - can be replaced with a better UI
         alert("إشعار جديد: " + message);
       }
     </script>

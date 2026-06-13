@@ -1,0 +1,81 @@
+{% extends 'base.html' %}{% load i18n %}{% load crispy_forms_tags %}{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <h2>{% translate "الإعدادات" %}</h2>
+    <ul class="nav nav-tabs mb-4" id="settingsTabs">
+      <li class="nav-item">
+        <a class="nav-link {% if active_tab != 'email' and active_tab != 'delete' %}active{% endif %}" href="#password" data-bs-toggle="tab">{% translate "تغيير كلمة المرور" %}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'email' %}active{% endif %}" href="#email" data-bs-toggle="tab">{% translate "تغيير البريد الإلكتروني" %}</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'delete' %}active{% endif %}" href="#delete" data-bs-toggle="tab">{% translate "حذف الحساب" %}</a>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade {% if active_tab != 'email' and active_tab != 'delete' %}show active{% endif %}" id="password">
+        <div class="card">
+          <div class="card-body">
+            <form method="post" action="{% url 'users:password_change' %}">
+              {% csrf_token %}
+              {{ password_form|crispy }}
+              <button type="submit" class="btn btn-primary w-100 mt-3">{% translate "تغيير كلمة المرور" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade {% if active_tab == 'email' %}show active{% endif %}" id="email">
+        <div class="card">
+          <div class="card-body">
+            <form method="post" action="{% url 'users:change_email' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">{% translate "البريد الإلكتروني الحالي" %}</label>
+                <input type="email" class="form-control" value="{{ user.email }}" disabled>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{% translate "البريد الإلكتروني الجديد" %}</label>
+                <input type="email" name="email" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{% translate "كلمة المرور للتأكيد" %}</label>
+                <input type="password" name="password" class="form-control" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">{% translate "تحديث البريد الإلكتروني" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade {% if active_tab == 'delete' %}show active{% endif %}" id="delete">
+        <div class="card border-danger">
+          <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">{% translate "حذف الحساب" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              {% translate "هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً." %}
+            </div>
+            <form method="post" action="{% url 'users:delete_account' %}" onsubmit="return confirm('{% translate "هل أنت متأكد؟ سيتم حذف الحساب نهائياً." %}')">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">{% translate "أكتب DELETE للتأكيد" %}</label>
+                <input type="text" name="confirm" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{% translate "كلمة المرور" %}</label>
+                <input type="password" name="password" class="form-control" required>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">{% translate "حذف الحساب نهائياً" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

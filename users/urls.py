@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views
+from . import views, views_settings
 
 app_name = 'users'
 
@@ -21,4 +21,8 @@ urlpatterns = [
     path('follow-requests/', views.follow_requests, name='follow_requests'),
     path('follow-requests/<int:request_id>/accept/', views.accept_follow_request, name='accept_follow_request'),
     path('follow-requests/<int:request_id>/reject/', views.reject_follow_request, name='reject_follow_request'),
+    path('settings/', views_settings.settings_view, name='settings'),
+    path('settings/password/', views_settings.UserPasswordChangeView.as_view(), name='password_change'),
+    path('settings/email/', views_settings.change_email, name='change_email'),
+    path('settings/delete/', views_settings.delete_account, name='delete_account'),
 ]
