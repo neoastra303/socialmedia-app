@@ -127,6 +127,16 @@
                 {% translate "الرسائل" %}
               </a>
             </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'posts:saved_posts' %}"
+                aria-label="Saved Posts"
+              >
+                <i class="fas fa-bookmark me-1"></i>
+                {% translate "المحفوظات" %}
+              </a>
+            </li>
             {% endif %}
           </ul>
           {% if user.is_authenticated %}

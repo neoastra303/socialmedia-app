@@ -17,4 +17,6 @@ urlpatterns = [
       path('api/posts/', views.api_post_list, name='api_post_list'),
       path('hashtag/<str:hashtag_name>/', views.hashtag_posts, name='hashtag_posts'),
       path('trending/', views.trending_hashtags, name='trending_hashtags'),
+      path('saved/', views.saved_posts, name='saved_posts'),
+      path('<int:post_id>/bookmark/', views.bookmark_toggle, name='bookmark_toggle'),
   ]

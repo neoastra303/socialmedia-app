@@ -8,10 +8,11 @@ from django.db.models import Q
 from django_ratelimit.decorators import ratelimit
 from middleware.rate_limiting import post_creation_ratelimit, user_ratelimit
 from django.core.exceptions import ValidationError
-from .models import Post, Comment, Hashtag, Reaction, Story
+from .models import Post, Comment, Hashtag, Reaction, Story, Bookmark
 from notifications.utils import send_notification
 from .forms import PostForm, CommentForm
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import PostSerializer
@@ -322,6 +323,25 @@ def view_story(request, story_id):
     if not story.is_expired():
         story.views.add(request.user)
     return render(request, 'posts/view_story.html', {'story': story})
+
+@login_required
+@require_POST
+def bookmark_toggle(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    bookmark = Bookmark.objects.filter(user=request.user, post=post)
+    if bookmark.exists():
+        bookmark.delete()
+        messages.success(request, _('تم إزالة المنشور من المحفوظات.'))
+    else:
+        Bookmark.objects.create(user=request.user, post=post)
+        messages.success(request, _('تم حفظ المنشور.'))
+    return redirect(request.META.get('HTTP_REFERER', 'posts:post_list'))
+
+@login_required
+def saved_posts(request):
+    bookmarks = Bookmark.objects.filter(user=request.user).select_related('post__author').order_by('-created_at')
+    posts = [b.post for b in bookmarks]
+    return render(request, 'posts/saved_posts.html', {'posts': posts})
 
 @api_view(['GET'])
 def api_post_list(request):

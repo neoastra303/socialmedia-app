@@ -126,6 +126,16 @@
             >
               {% translate "عرض التعليقات" %}
             </a>
+            <form
+              method="post"
+              action="{% url 'posts:bookmark_toggle' post.id %}"
+              class="d-inline"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-warning">
+                <i class="fas fa-bookmark"></i>
+              </button>
+            </form>
           </div>
         </div>
       </div>

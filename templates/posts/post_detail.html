@@ -119,6 +119,19 @@ og_type %}article{% endblock %}{% if post.image %}{% block og_extra %}<meta
             </form>
           </div>
           {% endif %}
+          <form
+            method="post"
+            action="{% url 'posts:bookmark_toggle' post.id %}"
+            class="d-inline me-2"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn btn-sm btn-outline-warning border-0"
+            >
+              <i class="fas fa-bookmark"></i>
+            </button>
+          </form>
         </div>
       </div>
     </div>
