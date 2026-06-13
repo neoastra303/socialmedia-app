@@ -49,6 +49,12 @@ class Profile(models.Model):
         if self.bio and len(self.bio) > 500:
             raise ValidationError("Bio cannot exceed 500 characters.")
         
+        if self.bio:
+            from posts.utils import contains_profanity
+            if contains_profanity(self.bio):
+                raise ValidationError("Bio contains inappropriate language.")
+            raise ValidationError("Bio cannot exceed 500 characters.")
+        
         if self.location and len(self.location) > 100:
             raise ValidationError("Location cannot exceed 100 characters.")
         

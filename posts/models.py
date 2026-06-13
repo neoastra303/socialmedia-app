@@ -48,6 +48,10 @@ class Post(models.Model):
         # Validate content length
         if self.content and len(self.content.strip()) < 1:
             raise ValidationError('Post content cannot be empty.')
+        if self.content:
+            from .utils import contains_profanity
+            if contains_profanity(self.content):
+                raise ValidationError('Post content contains inappropriate language.')
         
         # Validate that both image and video are not provided at the same time
         if self.image and self.video:
@@ -193,6 +197,9 @@ class Comment(models.Model):
         
         if len(self.content) > 1000:
             raise ValidationError("Comment content cannot exceed 1000 characters.")
+        from .utils import contains_profanity
+        if self.content and contains_profanity(self.content):
+            raise ValidationError("Comment content contains inappropriate language.")
         
         # Validate that a comment cannot be its own parent
         if self.pk and self.parent and self.parent.pk == self.pk:
