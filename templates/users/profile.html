@@ -19,14 +19,25 @@
           {% translate "تعديل الملف الشخصي" %}
         </a>
         {% else %}
-        {% if user in request.user.profile.following.all %}
-        <a href="{% url 'users:unfollow_user' user.username %}" class="btn btn-danger">
-          {% translate "إلغاء المتابعة" %}
+        {% if request.user.profile.is_blocked user %}
+        <a href="{% url 'users:unblock_user' user.username %}" class="btn btn-outline-success btn-sm">
+          {% translate "إلغاء الحظر" %}
         </a>
         {% else %}
-        <a href="{% url 'users:follow_user' user.username %}" class="btn btn-primary">
-          {% translate "متابعة" %}
-        </a>
+        <div class="d-flex gap-2 justify-content-center">
+          {% if user in request.user.profile.following.all %}
+          <a href="{% url 'users:unfollow_user' user.username %}" class="btn btn-danger">
+            {% translate "إلغاء المتابعة" %}
+          </a>
+          {% else %}
+          <a href="{% url 'users:follow_user' user.username %}" class="btn btn-primary">
+            {% translate "متابعة" %}
+          </a>
+          {% endif %}
+          <a href="{% url 'users:block_user' user.username %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('{% translate "هل أنت متأكد من حظر هذا المستخدم؟" %}')">
+            {% translate "حظر" %}
+          </a>
+        </div>
         {% endif %}
         {% endif %}
         

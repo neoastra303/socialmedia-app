@@ -22,7 +22,10 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def post_list(request):
-    posts = Post.objects.select_related('author').all().order_by('-created_at')
+    blocked = request.user.profile.blocked_users.values_list('user_id', flat=True)
+    blocked_by = request.user.profile.blocked_by.values_list('user_id', flat=True)
+    exclude_ids = set(blocked) | set(blocked_by)
+    posts = Post.objects.select_related('author').exclude(author_id__in=exclude_ids).order_by('-created_at')
     paginator = Paginator(posts, 10)
     
     page_number = request.GET.get('page')
@@ -231,10 +234,12 @@ def search(request):
 
         if query:
             if filter_type in ['all', 'posts']:
-                # Search in posts content and hashtags
+                blocked = request.user.profile.blocked_users.values_list('user_id', flat=True)
+                blocked_by = request.user.profile.blocked_by.values_list('user_id', flat=True)
                 posts = Post.objects.filter(
                     Q(content__icontains=query) |
                     Q(hashtags__name__icontains=query)
+                ).exclude(author_id__in=set(blocked) | set(blocked_by)
                 ).select_related('author').distinct().order_by('-created_at')
                 paginator = Paginator(posts, 10)
                 page_number = request.GET.get('page')
@@ -242,10 +247,12 @@ def search(request):
 
             if filter_type in ['all', 'users']:
                 # Search in users
+                blocked = request.user.profile.blocked_users.values_list('user_id', flat=True)
+                blocked_by = request.user.profile.blocked_by.values_list('user_id', flat=True)
                 users = User.objects.filter(
                     Q(username__icontains=query) |
                     Q(profile__bio__icontains=query)
-                ).distinct()
+                ).exclude(id__in=set(blocked) | set(blocked_by)).distinct()
                 results['users'] = users
 
         return render(request, 'posts/search_results.html', results)
