@@ -76,6 +76,23 @@ class UserUpdateForm(forms.ModelForm):
         return email
 
 
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        label=_('البريد الإلكتروني أو اسم المستخدم'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('البريد الإلكتروني أو اسم المستخدم'),
+        })
+    )
+    password = forms.CharField(
+        label=_('كلمة المرور'),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('كلمة المرور'),
+        })
+    )
+
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile

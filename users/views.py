@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django_ratelimit.decorators import ratelimit
 from middleware.rate_limiting import ip_ratelimit
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, LoginForm
 from django.contrib.auth.models import User
 from posts.models import Post
 from notifications.utils import send_notification
@@ -124,29 +124,27 @@ def logout_view(request):
 @ip_ratelimit
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        # Validate input
-        if not username or not password:
-            messages.error(request, _('يجب إدخال اسم المستخدم وكلمة المرور.'))
-            return render(request, 'users/login.html')
-        
-        try:
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                if user.is_active and user.profile.email_verified:
-                    login(request, user)
-                    messages.success(request, _('تم تسجيل دخولك بنجاح!'))
-                    return redirect('posts:post_list')
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            try:
+                user = authenticate(request, username=username, password=password)
+                if user is not None:
+                    if user.is_active and user.profile.email_verified:
+                        login(request, user)
+                        messages.success(request, _('تم تسجيل دخولك بنجاح!'))
+                        return redirect('posts:post_list')
+                    else:
+                        messages.error(request, _('يجب تفعيل حسابك عبر البريد الإلكتروني قبل تسجيل الدخول.'))
                 else:
-                    messages.error(request, _('يجب تفعيل حسابك عبر البريد الإلكتروني قبل تسجيل الدخول.'))
-            else:
-                messages.error(request, _('اسم المستخدم أو كلمة المرور غير صحيحة'))
-        except Exception as e:
-            logger.error(f"Error during login: {str(e)}")
-            messages.error(request, _('حدث خطأ أثناء تسجيل الدخول.'))
-    return render(request, 'users/login.html')
+                    messages.error(request, _('البريد الإلكتروني/اسم المستخدم أو كلمة المرور غير صحيحة'))
+            except Exception as e:
+                logger.error(f"Error during login: {str(e)}")
+                messages.error(request, _('حدث خطأ أثناء تسجيل الدخول.'))
+    else:
+        form = LoginForm()
+    return render(request, 'users/login.html', {'form': form})
 
 @login_required
 def follow_user(request, username):
