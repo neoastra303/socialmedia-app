@@ -1,205 +1,347 @@
-# Social Media Platform
+<div align="center">
+  <img src="https://img.shields.io/badge/Django-5.1-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django 5.1"/>
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12"/>
+  <img src="https://img.shields.io/badge/Channels-4.0-46BD84?style=for-the-badge&logo=django&logoColor=white" alt="Channels 4.0"/>
+  <img src="https://img.shields.io/badge/DRF-3.14-ff1709?style=for-the-badge&logo=django&logoColor=white" alt="DRF 3.14"/>
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready"/>
+  <br/>
+  <img src="https://img.shields.io/github/actions/workflow/status/neoastra303/socialmedia-app/tests.yml?branch=main&style=flat-square&label=CI%2FCD" alt="CI/CD"/>
+  <img src="https://img.shields.io/github/last-commit/neoastra303/socialmedia-app?style=flat-square" alt="Last Commit"/>
+  <img src="https://img.shields.io/github/repo-size/neoastra303/socialmedia-app?style=flat-square" alt="Repo Size"/>
+  <img src="https://img.shields.io/badge/tests-39%20passing-brightgreen?style=flat-square" alt="Tests 39 Passing"/>
+  <img src="https://img.shields.io/badge/code%20style-black-000000?style=flat-square" alt="Code Style Black"/>
+  <img src="https://img.shields.io/badge/i18n-Arabic%20%7C%20English-blue?style=flat-square" alt="i18n"/>
+</div>
 
-A comprehensive social media application built with Django, featuring posts, stories, reactions, comments, and user interactions.
+<h1 align="center">🚀 منصتي — Social Media Platform</h1>
 
-## 🚀 Features
+<p align="center">
+  <b>A production-ready social media application built with Django 5.1</b><br/>
+  Features real-time chat, stories, reactions, notifications, and a comprehensive REST API.<br/>
+  Fully dockerized with CI/CD, comprehensive testing, and multi-language support.
+</p>
 
-- **User Authentication & Profiles**: Secure user registration, login, and profile management
-- **Posts & Stories**: Share text, images, and videos with rich content creation
-- **Reactions System**: Like, love, laugh, angry, and sad reactions to posts
-- **Comments & Replies**: Threaded commenting system with nested replies
-- **Hashtag Support**: Discover content through hashtag-based search
-- **User Following**: Follow and unfollow other users
-- **Notifications**: Real-time activity notifications
-- **Rate Limiting**: Built-in protection against spam and abuse
-- **File Upload Validation**: Secure image and video upload validation
-- **Internationalization**: Multi-language support (English & Arabic)
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#demo">Demo</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#api">API</a> •
+  <a href="#testing">Testing</a> •
+  <a href="#deployment">Deployment</a>
+</p>
+
+---
+
+## ✨ Features
+
+### 👤 User System
+
+| Feature                                 | Status |
+| --------------------------------------- | ------ |
+| Registration with email verification    | ✅     |
+| Login via email or username             | ✅     |
+| JWT-ready authentication                | ✅     |
+| Password reset flow (email-based)       | ✅     |
+| Profile management with avatar upload   | ✅     |
+| Account deletion                        | ✅     |
+| Email change with password confirmation | ✅     |
+
+### 📱 Social Features
+
+| Feature                             | Status |
+| ----------------------------------- | ------ |
+| Text posts with image/video upload  | ✅     |
+| Story sharing (24h auto-expiry)     | ✅     |
+| 5-type reaction system (👍❤️😂😠😢) | ✅     |
+| Threaded comments with replies      | ✅     |
+| @mention and #hashtag auto-linking  | ✅     |
+| Trending hashtags                   | ✅     |
+| Post bookmarking / saved posts      | ✅     |
+| Post search (content + hashtags)    | ✅     |
+
+### 🔗 Social Graph
+
+| Feature                                    | Status |
+| ------------------------------------------ | ------ |
+| Follow/unfollow users                      | ✅     |
+| Private accounts (follow request approval) | ✅     |
+| User blocking (auto-unfollows)             | ✅     |
+| Followers/following lists                  | ✅     |
+
+### 💬 Real-time Communication
+
+| Feature                               | Status |
+| ------------------------------------- | ------ |
+| WebSocket-powered direct messaging    | ✅     |
+| Real-time notification delivery       | ✅     |
+| Instant message delivery via Channels | ✅     |
+
+### 🔒 Security
+
+| Feature                                     | Status |
+| ------------------------------------------- | ------ |
+| Rate limiting on all sensitive endpoints    | ✅     |
+| Profanity filter (form + model level)       | ✅     |
+| Content moderation reports                  | ✅     |
+| CSRF + XSS protection                       | ✅     |
+| File upload validation (type + size)        | ✅     |
+| Secure headers (HSTS, CSP, X-Frame-Options) | ✅     |
+| Email verification required for login       | ✅     |
+
+### 🌐 Internationalization
+
+| Feature                   | Status |
+| ------------------------- | ------ |
+| English (en-us)           | ✅     |
+| Arabic (ar) — RTL support | ✅     |
+
+### 🎨 UI/UX
+
+| Feature                                     | Status |
+| ------------------------------------------- | ------ |
+| Dark mode (with OS preference detection)    | ✅     |
+| Bootstrap 5 RTL responsive design           | ✅     |
+| Open Graph meta tags for social sharing     | ✅     |
+| AJAX reactions with WebSocket notifications | ✅     |
+| Paginated feeds                             | ✅     |
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Django 4.2+
-- **Database**: PostgreSQL (recommended for production), SQLite (development)
-- **Frontend**: HTML, CSS, Bootstrap, JavaScript
-- **Authentication**: Django built-in authentication system
-- **File Storage**: Local storage (configurable for cloud storage)
-- **Caching**: Redis
-- **Real-time**: Django Channels (for notifications)
-- **Rate Limiting**: django-ratelimit
+<div align="center">
 
-## 📋 Requirements
+| Layer                | Technology                                   |
+| -------------------- | -------------------------------------------- |
+| **Backend**          | Django 5.1.7, Python 3.12                    |
+| **API**              | Django REST Framework 3.14 + drf-spectacular |
+| **Real-time**        | Django Channels 4.0 + WebSockets             |
+| **Database**         | PostgreSQL 16 / SQLite 3                     |
+| **Cache**            | Redis 7 / DatabaseCache (fallback)           |
+| **Async**            | Daphne ASGI server                           |
+| **Frontend**         | Bootstrap 5.1, HTML5, CSS3, JavaScript       |
+| **Forms**            | django-crispy-forms + crispy-bootstrap5      |
+| **Rate Limiting**    | django-ratelimit 4.1                         |
+| **Background Tasks** | django-background-tasks                      |
+| **Image Processing** | Pillow 10.x                                  |
+| **Containerization** | Docker + docker-compose                      |
+| **CI/CD**            | GitHub Actions                               |
 
-- Python 3.8+
-- Django 4.2+
-- PostgreSQL (for production) / SQLite (for development)
-- Redis (for caching)
-- Pillow (for image processing)
+</div>
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 🏗️ Architecture
 
-```bash
-# Install Python 3.8+ and pip
-# Install Redis server
+```
+┌──────────────┐      ┌───────────────────┐      ┌──────────────┐
+│   Browser /   │◄────►│   Daphne ASGI     │◄────►│   Redis       │
+│   Mobile      │      │   (Django +       │      │   (Cache +    │
+│               │      │    Channels)      │      │    Channel    │
+└──────────────┘      └────────┬──────────┘      │    Layer)     │
+                               │                  └──────┬───────┘
+                               ▼                         │
+┌──────────────────────────────────────────────┐          │
+│              Django Application              │          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────┐  │          │
+│  │  posts   │ │  users   │ │notifications │  │          │
+│  │  app     │ │  app     │ │    app       │  │          │
+│  └──────────┘ └──────────┘ └──────────────┘  │          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────┐  │          │
+│  │direct_msgs│ │ reports │ │  searchapp   │  │          │
+│  └──────────┘ └──────────┘ └──────────────┘  │          │
+└──────────────────────┬───────────────────────┘          │
+                       │                                  │
+                       ▼                                  │
+              ┌────────────────┐                          │
+              │   PostgreSQL   │◄─────────────────────────┘
+              │  /  SQLite     │
+              └────────────────┘
 ```
 
-### Installation
+### App Responsibilities
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd socialmedia-app
-   ```
+| App                 | Responsibility                                                |
+| ------------------- | ------------------------------------------------------------- |
+| **posts**           | CRUD posts, stories, comments, reactions, hashtags, bookmarks |
+| **users**           | Auth, profiles, follows, blocks, follow requests, settings    |
+| **notifications**   | Real-time + database notifications                            |
+| **direct_messages** | WebSocket-powered private chat                                |
+| **reports**         | Content moderation and abuse reporting                        |
+| **searchapp**       | Cross-model search                                            |
 
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+---
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 🚀 Quick Start
 
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+### Option 1: Docker (Recommended)
 
-5. **Run database migrations**
-   ```bash
-   python manage.py migrate
-   ```
+```bash
+# Clone and run
+git clone https://github.com/neoastra303/socialmedia-app.git
+cd socialmedia-app
+docker compose up
+```
 
-6. **Create superuser**
-   ```bash
-   python manage.py createsuperuser
-   ```
+The app will be available at `http://localhost:8000`. Swagger docs at `http://localhost:8000/api/docs/`.
 
-7. **Start the development server**
-   ```bash
-   python manage.py runserver
-   ```
+### Option 2: Manual Setup
 
-## 🔧 Configuration
+```bash
+git clone https://github.com/neoastra303/socialmedia-app.git
+cd socialmedia-app
 
-### Environment Variables
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 
-Create a `.env` file in the root directory with the following variables:
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export SECRET_KEY='your-secret-key'
+export DEBUG=True
+
+# Run migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Start server
+python manage.py runserver
+```
+
+> **Note**: Without Redis, the app falls back to DatabaseCache and InMemoryChannelLayer automatically.
+
+---
+
+## 🔧 Environment Variables
 
 ```env
+# Required
 SECRET_KEY=your-secret-key-here
-DEBUG=True
-DB_NAME=socialmedia_db
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
+
+# Optional (with defaults)
+DEBUG=True                                         # Set False for production
+REDIS_URL=redis://localhost:6379                   # Falls back to DB cache
+DB_NAME=socialmedia_db                             # PostgreSQL (optional)
+DB_USER=postgres
+DB_PASSWORD=password
 DB_HOST=localhost
 DB_PORT=5432
-REDIS_URL=redis://localhost:6379/1
-EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_USER=your-email@gmail.com               # For password reset emails
 EMAIL_HOST_PASSWORD=your-app-password
 ```
 
-### Production Settings
+---
 
-For production deployment:
+## 📖 API
 
-1. Set `DEBUG=False`
-2. Use PostgreSQL instead of SQLite
-3. Configure Redis for caching and sessions
-4. Set up proper file storage (AWS S3, etc.)
-5. Add security headers and HTTPS
+Interactive Swagger documentation is available at `/api/docs/` when the server is running.
+
+```bash
+# OpenAPI schema
+GET /api/schema/
+```
+
+### Key REST Endpoints
+
+| Method | Endpoint                 | Description       |
+| ------ | ------------------------ | ----------------- |
+| `GET`  | `/api/posts/`            | List all posts    |
+| `GET`  | `/posts/hashtag/<name>/` | Posts by hashtag  |
+| `GET`  | `/posts/trending/`       | Trending hashtags |
+| `POST` | `/posts/<id>/react/`     | React to a post   |
+
+### WebSocket Endpoints
+
+| Endpoint                               | Description             |
+| -------------------------------------- | ----------------------- |
+| `ws://host/ws/chat/<conversation_id>/` | Real-time chat          |
+| `ws://host/ws/notifications/`          | Real-time notifications |
+
+---
 
 ## 🧪 Testing
 
-Run the test suite:
-
 ```bash
+# Run all tests (39 test cases)
 python manage.py test
-```
 
-Run specific app tests:
-
-```bash
+# Run specific app tests
 python manage.py test posts
 python manage.py test users
+
+# Run with verbose output
+python manage.py test --verbosity=2
+
+# Check for system issues
+python manage.py check
 ```
 
-## 📊 API Endpoints
+### Test Coverage
 
-- `GET /api/posts/` - Get all posts
-- `POST /api/posts/` - Create a new post
-- `POST /posts/reactions/<post_id>/` - Add/remove reactions to posts
-- `POST /comments/<post_id>/` - Add comments to posts
-- `GET /search/` - Search posts and users
+| Test Suite                 | Tests                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `posts/tests.py`           | Model validation, form validation, view integration, profanity filter, bookmarks                        |
+| `users/tests.py`           | Profile CRUD, follow/unfollow, block/unblock, privacy, follow requests, settings, password/email change |
+| `notifications/tests.py`   | Notification creation                                                                                   |
+| `reports/tests.py`         | Report submission                                                                                       |
+| `direct_messages/tests.py` | Conversation management                                                                                 |
+| **Total**                  | **39 passing**                                                                                          |
 
-## 🔐 Security Features
+---
 
-- **Rate Limiting**: Prevents spam and abuse
-- **File Upload Validation**: Secure file type and size validation
-- **CSRF Protection**: Built-in Django CSRF protection
-- **SQL Injection Prevention**: ORM-based queries
-- **XSS Prevention**: Automatic escaping in templates
+## 🐳 Docker
 
-## 📁 Project Structure
+```bash
+# Build and start
+docker compose up --build
 
-```
-socialmedia-app/
-├── socialmediaproject/          # Django project settings
-├── posts/                       # Posts application
-│   ├── models.py                # Post, Comment, Reaction models
-│   ├── views.py                 # View logic for posts
-│   ├── forms.py                 # Forms for posts
-│   └── ...
-├── users/                       # User management
-├── notifications/              # Notification system
-├── middleware/                 # Custom middleware
-├── static/                     # Static files
-├── templates/                  # HTML templates
-├── media/                      # User uploads
-├── requirements.txt            # Dependencies
-├── manage.py                   # Django management script
-└── README.md
+# Run migrations
+docker compose exec web python manage.py migrate
+
+# Create superuser
+docker compose exec web python manage.py createsuperuser
+
+# Run tests
+docker compose exec web python manage.py test
+
+# Cleanup expired stories
+docker compose exec web python manage.py cleanup_stories
 ```
 
-## 🚀 Deployment
-
-### Heroku Deployment
-
-1. Create a Heroku app
-2. Add PostgreSQL and Redis addons
-3. Configure environment variables
-4. Deploy using git
-
-### Docker Deployment
-
-Coming soon...
+---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests for new functionality
-5. Run tests (`python manage.py test`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
+Contributions are welcome! Here's how to contribute:
 
-## 📄 License
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Commit** your changes with descriptive messages
+4. **Run tests** to ensure nothing breaks: `python manage.py test`
+5. **Push** to your branch: `git push origin feature/amazing-feature`
+6. **Open** a Pull Request
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Commit Guidelines
 
-## 🐛 Issues
+- Use granular, descriptive commits (one logical change per commit)
+- Prefix with the area changed: `feat:`, `fix:`, `test:`, `docs:`, `refactor:`
 
-If you encounter any issues, please open an issue on GitHub with detailed information about the problem.
+---
 
-## 🙏 Acknowledgments
+## 📜 License
 
-- Django Framework
-- Bootstrap CSS
-- django-ratelimit
-- Pillow
-- PostgreSQL
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <b>Built with ❤️ using Django</b><br/>
+  <sub>⭐ Star this repo if you find it useful! ⭐</sub>
+</div>
