@@ -14,13 +14,13 @@
 body {
   direction: rtl;
   text-align: right;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 /* Navbar Styles */
 .navbar {
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .search-container {
@@ -49,14 +49,14 @@ footer {
 
 /* Card Styles */
 .card {
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
   background-color: white;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   font-weight: 500;
 }
 
@@ -86,23 +86,79 @@ footer {
 /* Custom Theme Styles */
 [data-theme="dark"] {
   background-color: #1a1a1a;
-  color: white;
+  color: #e0e0e0;
 }
 
-[data-theme="dark"] .card {
+[data-theme="dark"] .card,
+[data-theme="dark"] .card-header {
   background-color: #2d2d2d;
-  color: white;
+  color: #e0e0e0;
+  border-color: #444;
 }
 
 [data-theme="dark"] .navbar {
-  background-color: #333;
-  color: white;
+  background-color: #222;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .navbar .nav-link {
+  color: #ccc;
 }
 
 [data-theme="dark"] .form-control {
-  background-color: #444;
-  color: white;
+  background-color: #3a3a3a;
+  color: #e0e0e0;
   border: 1px solid #555;
+}
+
+[data-theme="dark"] .form-control:focus {
+  background-color: #444;
+  color: #fff;
+}
+
+[data-theme="dark"] footer {
+  background-color: #222;
+}
+
+[data-theme="dark"] .bg-light {
+  background-color: #3a3a3a !important;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .text-muted {
+  color: #999 !important;
+}
+
+[data-theme="dark"] .modal-content {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .btn-outline-secondary {
+  color: #ccc;
+  border-color: #555;
+}
+
+[data-theme="dark"] .list-group-item {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+[data-theme="dark"] .pagination .page-link {
+  background-color: #2d2d2d;
+  color: #ccc;
+  border-color: #444;
+}
+
+[data-theme="dark"] .pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+[data-theme="dark"] a:not(.btn) {
+  color: #66b0ff;
 }
 
 /* Reactions */
@@ -115,7 +171,7 @@ footer {
   .search-container {
     display: none;
   }
-  
+
   .container {
     padding: 0 10px;
   }
