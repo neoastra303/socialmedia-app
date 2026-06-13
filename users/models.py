@@ -36,6 +36,7 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     email_verified = models.BooleanField(default=False)
+    blocked_users = models.ManyToManyField('self', symmetrical=False, related_name='blocked_by', blank=True)
     
     def __str__(self):
         """String representation of the Profile model."""
@@ -83,6 +84,22 @@ class Profile(models.Model):
     def unfollow(self, user):
         self.following.remove(user.profile)
         return True
+
+    def block(self, user):
+        if user == self.user:
+            return False
+        target = user.profile
+        self.following.remove(target)
+        target.followers.remove(self)
+        self.blocked_users.add(target)
+        return True
+
+    def unblock(self, user):
+        self.blocked_users.remove(user.profile)
+        return True
+
+    def is_blocked(self, user):
+        return self.blocked_users.filter(id=user.profile.id).exists()
 
     @property
     def followers_count(self):
