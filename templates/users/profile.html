@@ -14,7 +14,19 @@
         <p><i class="fas fa-map-marker-alt me-1"></i> {{ user.profile.location }}</p>
         {% endif %}
         
-        {% if user == request.user %}
+{% if user == request.user %}
+        <p>
+          {% if user.profile.is_private %}
+          <span class="badge bg-warning">{% translate "حساب خاص" %}</span>
+          {% else %}
+          <span class="badge bg-success">{% translate "حساب عام" %}</span>
+          {% endif %}
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+          <a href="{% url 'users:follow_requests' %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-user-plus"></i> {% translate "طلبات المتابعة" %}
+          </a>
+        </div>
         <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
           {% translate "تعديل الملف الشخصي" %}
         </a>

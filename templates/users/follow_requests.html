@@ -1,0 +1,47 @@
+{% extends 'base.html' %}{% load i18n %}{% block content %}
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <h2>{% translate "طلبات المتابعة" %}</h2>
+    {% for req in requests %}
+    <div class="card mb-2">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div>
+          <a href="{% url 'users:profile' req.from_user.user.username %}">
+            <img
+              src="{{ req.from_user.image.url }}"
+              class="rounded-circle me-2"
+              width="40"
+              height="40"
+              alt="{{ req.from_user.user.username }}"
+            />
+            <strong>{{ req.from_user.user.username }}</strong>
+          </a>
+        </div>
+        <div class="d-flex gap-2">
+          <form
+            method="post"
+            action="{% url 'users:accept_follow_request' req.id %}"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm">
+              {% translate "قبول" %}
+            </button>
+          </form>
+          <form
+            method="post"
+            action="{% url 'users:reject_follow_request' req.id %}"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">
+              {% translate "رفض" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p>{% translate "لا توجد طلبات متابعة." %}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

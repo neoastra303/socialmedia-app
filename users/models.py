@@ -36,6 +36,7 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     email_verified = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False, help_text='Private account requires approval for followers')
     blocked_users = models.ManyToManyField('self', symmetrical=False, related_name='blocked_by', blank=True)
     
     def __str__(self):
@@ -108,6 +109,19 @@ class Profile(models.Model):
     @property
     def following_count(self):
         return self.following.count()
+
+
+class FollowRequest(models.Model):
+    from_user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='sent_follow_requests')
+    to_user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='received_follow_requests')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.from_user.user.username} wants to follow {self.to_user.user.username}"
 
 
 

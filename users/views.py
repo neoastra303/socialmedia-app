@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from posts.models import Post
 from notifications.utils import send_notification
 from django.core.exceptions import ValidationError
+from .models import FollowRequest
 import logging
 
 logger = logging.getLogger(__name__)
@@ -159,6 +160,15 @@ def follow_user(request, username):
             messages.warning(request, _(f'أنت تتابع {username} بالفعل'))
             return redirect('users:profile', username=username)
         
+        # Check if the target account is private
+        if user_to_follow.profile.is_private:
+            FollowRequest.objects.get_or_create(
+                from_user=request.user.profile,
+                to_user=user_to_follow.profile
+            )
+            messages.success(request, _(f'تم إرسال طلب متابعة إلى {username}'))
+            return redirect('users:profile', username=username)
+        
         if request.user.profile.follow(user_to_follow):
             messages.success(request, _(f'أنت الآن تتابع {username}'))
             # Send notification
@@ -234,6 +244,27 @@ def followers_list(request, username):
         'user': user,
         'followers': followers
     })
+
+@login_required
+def follow_requests(request):
+    requests_qs = FollowRequest.objects.filter(to_user=request.user.profile).select_related('from_user__user')
+    return render(request, 'users/follow_requests.html', {'requests': requests_qs})
+
+@login_required
+def accept_follow_request(request, request_id):
+    follow_req = get_object_or_404(FollowRequest, id=request_id, to_user=request.user.profile)
+    follow_req.from_user.following.add(request.user.profile)
+    request.user.profile.followers.add(follow_req.from_user)
+    follow_req.delete()
+    messages.success(request, _(f'تم قبول طلب المتابعة.'))
+    return redirect('users:follow_requests')
+
+@login_required
+def reject_follow_request(request, request_id):
+    follow_req = get_object_or_404(FollowRequest, id=request_id, to_user=request.user.profile)
+    follow_req.delete()
+    messages.success(request, _(f'تم رفض طلب المتابعة.'))
+    return redirect('users:follow_requests')
 
 @login_required
 def following_list(request, username):

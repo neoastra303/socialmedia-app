@@ -97,7 +97,7 @@ class LoginForm(forms.Form):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['image', 'bio']
+        fields = ['image', 'bio', 'is_private']
         widgets = {
             'image': forms.FileInput(attrs={
                 'class': 'form-control',
@@ -108,6 +108,9 @@ class ProfileUpdateForm(forms.ModelForm):
                 'rows': 3,
                 'placeholder': _('اكتب نبذة عنك...'),
                 'maxlength': 500
+            }),
+            'is_private': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
             })
         }
     

@@ -18,4 +18,7 @@ urlpatterns = [
     path('profile/<str:username>/block/', views.block_user, name='block_user'),
     path('profile/<str:username>/unblock/', views.unblock_user, name='unblock_user'),
     path('blocked/', views.blocked_users_list, name='blocked_users_list'),
+    path('follow-requests/', views.follow_requests, name='follow_requests'),
+    path('follow-requests/<int:request_id>/accept/', views.accept_follow_request, name='accept_follow_request'),
+    path('follow-requests/<int:request_id>/reject/', views.reject_follow_request, name='reject_follow_request'),
 ]
