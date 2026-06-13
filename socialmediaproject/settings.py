@@ -62,7 +62,8 @@ INSTALLED_APPS = [
      'crispy_bootstrap5',
      'django_ratelimit',
      'background_task',
-     'rest_framework',
+      'rest_framework',
+      'drf_spectacular',
  ]
 
 MIDDLEWARE = [
@@ -290,6 +291,19 @@ else:
     # For development, use less restrictive settings
     X_FRAME_OPTIONS = 'DENY'  # Still important to prevent clickjacking
     SECURE_REFERRER_POLICY = 'no-referrer-when-downgrade'
+
+# DRF Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Social Media App API',
+    'DESCRIPTION': 'API documentation for the social media application',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 # Logging configuration
 # Logging configuration
