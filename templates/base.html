@@ -10,6 +10,20 @@
     />
     <meta name="theme-color" content="#007bff" />
     <title>{% translate "منصة التواصل الاجتماعي" %}</title>
+    <meta
+      property="og:title"
+      content="{% block og_title %}{% translate 'منصة التواصل الاجتماعي' %}{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_description %}{% translate 'منصة تواصل اجتماعي لمشاركة المنشورات والتواصل مع الأصدقاء' %}{% endblock %}"
+    />
+    <meta
+      property="og:type"
+      content="{% block og_type %}website{% endblock %}"
+    />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    {% block og_extra %}{% endblock %}
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
